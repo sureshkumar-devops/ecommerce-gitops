@@ -3,6 +3,6 @@ replicaCount: 1
 deploymentStrategy: deployment
 
 image:
-  repository: lehardocker/gitops-app
+  repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
   tag: "dev-a3cf538"
