@@ -1,0 +1,16 @@
+{{- if eq .Values.deploymentStrategy "bluegreen" }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-preview
+
+spec:
+  selector:
+    app: my-app
+
+  ports:
+  - port: 80
+    targetPort: 3000
+
+{{- end }}

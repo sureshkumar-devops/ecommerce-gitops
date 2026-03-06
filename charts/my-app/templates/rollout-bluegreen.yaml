@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: my-app
+spec:
+  replicas: 3
+  strategy:
+   blueGreen:
+    activeService: my-app-active
+    previewService: my-app-preview
+    autoPromotionEnabled: false
+  selector:
+   matchLabels:
+     app: my-app
+  template:
+    metadata:
+     labels:
+       app: my-app
+    spec:
+     containers:
+     - name: my-app-c3
+       image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}" 

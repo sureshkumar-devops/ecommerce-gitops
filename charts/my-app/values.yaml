@@ -1,0 +1,30 @@
+replicaCount: 1
+
+image:
+  repository: lehardocker/ecommerce-app
+  pullPolicy: IfNotPresent
+  tag: "dev-21dab60"
+
+
+deploymentStrategy: deployment
+# options:
+# deployment
+# canary
+# bluegreen  
+
+
+serviceAccount:
+  create: false
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000  
+
+ingress:
+  enabled: false
+
+autoscaling:
+  enabled: false
+
+

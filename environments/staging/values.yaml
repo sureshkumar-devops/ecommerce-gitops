@@ -1,0 +1,9 @@
+replicaCount: 2
+
+
+deploymentStrategy: canary
+
+image:
+  repository: lehardocker/gitops-app
+  pullPolicy: IfNotPresent
+  tag: "dev-21dab60"

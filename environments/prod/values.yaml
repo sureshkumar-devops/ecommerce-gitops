@@ -1,0 +1,9 @@
+replicaCount: 3
+
+deploymentStrategy: bluegreen
+
+image:
+  repository: lehardocker/gitops-app
+  pullPolicy: IfNotPresent
+  tag: "dev-21dab60"
+
