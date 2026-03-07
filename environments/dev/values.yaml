@@ -5,4 +5,4 @@ deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
-  tag: "dev-a3cf538"
+  tag: dev-a3cf538
