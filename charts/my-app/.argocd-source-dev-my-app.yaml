@@ -4,5 +4,5 @@ helm:
     value: lehardocker/ecommerce-app
     forcestring: true
   - name: image.tag
-    value: dev-65a2c6a
+    value: dev-9eb8ffc
     forcestring: true
