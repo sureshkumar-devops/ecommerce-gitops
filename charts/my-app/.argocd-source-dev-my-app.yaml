@@ -1,8 +1,0 @@
-helm:
-  parameters:
-  - name: image.name
-    value: lehardocker/ecommerce-app
-    forcestring: true
-  - name: image.tag
-    value: dev-5d49b3c
-    forcestring: true
