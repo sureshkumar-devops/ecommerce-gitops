@@ -1,0 +1,25 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: ecommerce-image-updater  
+  namespace: argocd
+spec:
+  namespace: argocd
+
+  writeBackConfig:
+    method: "git:secret:argocd/git-creds"    
+
+    gitConfig:
+      repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
+      branch: "dev"
+
+  applicationRefs:
+    - namePattern: "dev-my-app"      
+      images:
+          - alias: "app"
+            imageName: "lehardocker/ecommerce-app"
+
+            commonUpdateSettings:
+                updateStrategy: newest-build
+                allowTags: regexp:^dev-.*
+
