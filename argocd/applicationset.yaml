@@ -13,9 +13,9 @@ spec:
     - env: staging
       namespace: staging
       branch: staging
-    - env: prod
-      branch: master
+    - env: prod      
       namespace: prod
+      branch: master
 
  template:
    metadata:
@@ -24,7 +24,7 @@ spec:
       argocd-image-updater.argoproj.io/image-list: app=lehardocker/ecommerce-app
       argocd-image-updater.argoproj.io/app.helm.image-name: image.repository
       argocd-image-updater.argoproj.io/app.helm.image-tag: image.tag
-      argocd-image-updater.argoproj.io/app.helm.values-file: ../../environments/dev/values.yaml
+      argocd-image-updater.argoproj.io/app.helm.values-file: ../../environments/{{env}}/values.yaml
       argocd-image-updater.argoproj.io/write-back-method: git
       argocd-image-updater.argoproj.io/git-branch: '{{branch}}'
       argocd-image-updater.argoproj.io/app.pull-secret: argocd/dockerhub-creds
