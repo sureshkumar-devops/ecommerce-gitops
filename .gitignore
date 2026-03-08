@@ -1,0 +1,15 @@
+# Ignore the manual K8s manifests containing secrets
+k8s/argocd-image-updater-config.yaml
+k8s/dockerhub-creds.yaml
+k8s/git-creds.yaml
+k8s/image-updater-rbac-fix.yaml
+k8s/image-updater-rbac.yaml
+k8s/image-updater.yaml
+
+# Ignore environment-specific secrets if any
+environments/*/secrets.yaml
+
+# General security
+*.pem
+*.key
+.env
