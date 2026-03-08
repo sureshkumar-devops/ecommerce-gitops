@@ -5,5 +5,5 @@ deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
-  tag: "dev-21dab60"
+  tag: "dev-21dab60"  # promoted from staging
 

@@ -14,8 +14,8 @@ data:
         defaultns: library
         default: true
 
-  git.user: "argocd-image-updater"
-  git.email: "argocd@example.com"
+  git.commit.user: "argocd-image-updater"
+  git.commit.email: "argocd@example.com"
 
   git.commit-message-template: |  
     chore(image): update {{ .AppName }} 

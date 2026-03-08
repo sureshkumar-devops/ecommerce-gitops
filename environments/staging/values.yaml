@@ -6,4 +6,4 @@ deploymentStrategy: canary
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
-  tag: "dev-21dab60"
+  tag: "dev-21dab60"   # promoted from dev

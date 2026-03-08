@@ -7,19 +7,15 @@ spec:
   namespace: argocd
 
   writeBackConfig:
-    method: "git:secret:argocd/git-creds"    
-
-    gitConfig:
-      repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
-      branch: "dev"
+    method: "git:secret:argocd/git-creds"
 
   applicationRefs:
-    - namePattern: "dev-my-app"      
+    - namePattern: "*-my-app"      
       images:
           - alias: "app"
             imageName: "lehardocker/ecommerce-app"
-
             commonUpdateSettings:
                 updateStrategy: newest-build
                 allowTags: regexp:^dev-.*
+                pullSecret: "pullsecret:argocd/dockerhub-creds"  
 
