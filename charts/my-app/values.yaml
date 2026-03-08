@@ -26,15 +26,4 @@ ingress:
 autoscaling:
   enabled: false
 
-gitCredentials:
-  name: git-creds
-  url: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
-  username: sureshkumar-devops
-  password: "" # passing the sensitive tokens via --set terminal/CI environment
-
-imageCredentials:
-  name: dockerhub-creds
-  username: lehardocker
-  password: ""  # passing the sensitive tokens via --set terminal/CI environment
-  auth: ""  # passing the sensitive tokens via --set terminal/CI environment
 
