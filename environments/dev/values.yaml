@@ -1,8 +1,6 @@
 replicaCount: 1
-
 deploymentStrategy: deployment
-
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
-  tag: "dev-a3cf538"   # Image Updater will replace this with dev-<sha>
+  tag: "dev-fb7810e" # Image Updater will replace this with dev-<sha>
