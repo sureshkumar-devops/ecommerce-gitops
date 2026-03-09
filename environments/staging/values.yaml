@@ -1,9 +1,6 @@
 replicaCount: 2
-
-
 deploymentStrategy: canary
-
 image:
   repository: lehardocker/gitops-app
   pullPolicy: IfNotPresent
-  tag: ""dev-f6999e2""
+  tag: "dev-f6999e2"
