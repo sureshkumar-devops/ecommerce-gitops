@@ -3,4 +3,4 @@ deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
-  tag: "dev-e0413a7" # Image Updater will replace this with dev-<sha>
+  tag: "dev-3a5e9cf" # Image Updater will replace this with dev-<sha>
