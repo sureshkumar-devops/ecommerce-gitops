@@ -3,4 +3,4 @@ deploymentStrategy: canary
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
-  tag: "dev-1233f73"
+  tag: "dev-acd8652"
