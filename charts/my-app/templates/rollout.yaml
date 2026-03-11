@@ -13,8 +13,7 @@ spec:
     - setWeight: 20
     - pause: { duration: 30s }
     - setWeight: 50
-    - pause: { duration: 30s }
-    - setWeigth: 100
+    - pause: { duration: 30s }  
  selector:
    matchLabels:
      app: my-app
