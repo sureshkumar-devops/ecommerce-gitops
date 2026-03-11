@@ -29,6 +29,6 @@ spec:
       image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}" # <-- promoted tag from Dev
       imagePullPolicy: {{ .Values.image.pullPolicy }}  
       ports:
-        - containerPort: 80   
+        - containerPort: {{ .Values.service.port }}   
 {{- end }}        
 
