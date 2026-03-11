@@ -1,30 +1,48 @@
 {{- if eq .Values.deploymentStrategy "bluegreen" }}
-
 # Blue Green Rollout for production
-
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: {{ include "my-app.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "my-app.labels" . | nindent 4 }}
 spec:
-  replicas: 3
-  strategy:
-   blueGreen:
-    activeService: my-app-active
-    previewService: my-app-preview
-    autoPromotionEnabled: false
+  replicas: {{ .Values.replicaCount | default 3 }}
+  revisionHistoryLimit: 3
   selector:
-   matchLabels:
-     app: my-app
+    matchLabels:
+      app: my-app
   template:
     metadata:
-     labels:
-       app: my-app
+      labels:
+        app: my-app
     spec:
-     containers:
-     - name: my-app-c3
-       image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}" 
-       ports:
-       - containerPort: {{ .Values.containerPort }}
+      containers:
+        - name: my-app-c3
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPort }}
+          # FIX: Probes added to prevent the 404 crash loop during the Green phase
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probePath | default "/" }}
+              port: {{ .Values.containerPort }}
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probePath | default "/" }}
+              port: {{ .Values.containerPort }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default 20 }}
+            periodSeconds: 10
+  strategy:
+    blueGreen:
+      # These services must exist in your service.yaml
+      activeService: {{ include "my-app.fullname" . }}-active
+      previewService: {{ include "my-app.fullname" . }}-preview
+      # Manual promotion: You must run 'kubectl argo rollouts promote' to switch traffic
+      autoPromotionEnabled: false
 {{- end }}
-       
