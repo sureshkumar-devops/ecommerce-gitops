@@ -7,6 +7,5 @@ image:
 service:
   port: 80          # external service port
   targetPort: 3000  # matches app inside container
-
 containerPort: 3000 # matches app inside container
-
+probePath: /index.html
