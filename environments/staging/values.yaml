@@ -1,9 +1,10 @@
 replicaCount: 2
-
-
 deploymentStrategy: canary
-
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
+<<<<<<< HEAD
   tag: "dev-21dab60"   # promoted from dev
+=======
+  tag: "dev-acd8652"
+>>>>>>> 98742b16575287948734f0f1d7945a6ba077c9d3
