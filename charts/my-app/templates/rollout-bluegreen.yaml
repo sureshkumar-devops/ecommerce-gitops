@@ -25,6 +25,6 @@ spec:
      - name: my-app-c3
        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}" 
        ports:
-       - containerPort: {{ .Values.conatinerPort }}
+       - containerPort: {{ .Values.containerPort }}
 {{- end }}
        
