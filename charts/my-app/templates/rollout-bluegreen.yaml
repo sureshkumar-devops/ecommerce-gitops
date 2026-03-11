@@ -1,5 +1,7 @@
 {{- if eq .Values.deploymentStrategy "bluegreen" }}
 
+# Blue Green Rollout for production
+
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
