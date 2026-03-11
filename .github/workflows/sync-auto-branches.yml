@@ -16,8 +16,7 @@ jobs:
      steps:
      - name: Checkout GitOps Repo
        uses: actions/checkout@v5
-       with:
-         repository: sureshkumar-devops/ecommerce-gitops         
+       with:               
          token: ${{ secrets.GITOPS_TOKEN }}   
          fetch-depth: 0
 
