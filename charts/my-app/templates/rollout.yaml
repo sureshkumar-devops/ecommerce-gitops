@@ -11,9 +11,9 @@ spec:
   canary:  
     steps:
     - setWeight: 20
-    - pause: { duration: 30s }
+    - pause: { duration: 60s }
     - setWeight: 50
-    - pause: { duration: 30s }  
+    - pause: { duration: 60s }  
     - setWeight: 100
  selector:
    matchLabels:
