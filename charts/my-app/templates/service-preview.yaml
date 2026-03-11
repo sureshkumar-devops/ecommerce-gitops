@@ -10,7 +10,8 @@ spec:
     app: my-app
 
   ports:
-  - port: 80
-    targetPort: 3000
+  - port: {{ .Values.service.Port }}
+    targetPort: {{ .Values.service.targetPort }}
+
 
 {{- end }}
