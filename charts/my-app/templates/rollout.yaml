@@ -30,7 +30,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
+            - name: http-canary
               containerPort: {{ .Values.containerPort }}
               protocol: TCP
           # Use / as the path if /health doesn't exist in your code
