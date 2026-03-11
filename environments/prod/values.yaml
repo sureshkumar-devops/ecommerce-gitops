@@ -3,10 +3,9 @@ deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
-  tag: "dev-9752e57"
-  
+  tag: "dev-9752e57"  
 service:
   port: 80          # external service port
-  targetPort: 3000  # matches app inside container
-  
+  targetPort: 3000  # matches app inside container  
 containerPort: 3000 # matches app inside container
+probePath: /index.html
