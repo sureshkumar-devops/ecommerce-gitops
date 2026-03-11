@@ -38,3 +38,4 @@ stringData:
 Generate the correct base64 string
 Run this on your machine (replace with your actual PAT):
 echo -n 'username:password' | base64 -w0
+-------------------------------------------------
