@@ -1,0 +1,11 @@
+# Ignore the manual K8s manifests containing secrets
+k8s/dockerhub-creds.yaml
+k8s/git-creds.yaml
+
+# Ignore environment-specific secrets if any
+environments/*/secrets.yaml
+
+# General security
+*.pem
+*.key
+.env
