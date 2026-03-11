@@ -1,32 +1,35 @@
-replicaCount: 1
-
+replicaCount: 2   # Canary needs at least 2 to show the split (e.g., 1 old, 1 new)
+deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
-  tag: "dev-c3e5504"  # leave empty, environment files will override
-
-deploymentStrategy: deployment
-# options:
-# deployment
-# canary
-# bluegreen  
-
-
-serviceAccount:
-  create: false
+  tag: "dev-c3e5504"
+# FIXED: Changed from /health to / to stop the CrashLoop
+probePath: / 
+containerPort: 3000
+# ADDED: These objects are required by your rollout.yaml template
+readinessProbe:
+  initialDelaySeconds: 5
+  timeoutSeconds: 2
+  periodSeconds: 10
+  failureThreshold: 3
+livenessProbe:
+  initialDelaySeconds: 15
+  timeoutSeconds: 2
+  periodSeconds: 10
+  failureThreshold: 3
 
 service:
   type: ClusterIP
   port: 80
-  targetPort: 3000 
-  
-containerPort: 3000  
-  
+  targetPort: 3000
+
+serviceAccount:
+  create: false
 
 ingress:
   enabled: false
 
 autoscaling:
   enabled: false
-
 
