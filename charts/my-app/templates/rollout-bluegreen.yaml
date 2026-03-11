@@ -23,7 +23,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
           ports:
-            - name: http
+            - name: http-bluegreen
               containerPort: {{ .Values.containerPort }}
           # FIX: Probes added to prevent the 404 crash loop during the Green phase
           readinessProbe:
