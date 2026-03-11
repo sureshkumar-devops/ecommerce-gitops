@@ -20,7 +20,7 @@ service:
   port: 80
   targetPort: 3000 
   
-conatinerPort: 3000  
+containerPort: 3000  
   
 
 ingress:
