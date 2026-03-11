@@ -27,8 +27,16 @@ spec:
      targetRevision: '{{branch}}'
      path: charts/my-app
      helm:
+<<<<<<< Updated upstream
        valueFiles:
        - environments/{{env}}/values.yaml
+=======
+          valueFiles:
+          - environments/{{env}}/values.yaml
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     destination:     
      server: https://kubernetes.default.svc
      namespace: '{{env}}'       
