@@ -9,7 +9,6 @@ service:
   targetPort: 3000 # matches app inside container
 containerPort: 3000 # matches app inside container
 probePath: /
-
 # Provide defaults for the probes
 readinessProbe:
   initialDelaySeconds: 5
