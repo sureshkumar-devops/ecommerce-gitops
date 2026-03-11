@@ -7,9 +7,9 @@ metadata:
 spec:
   selector:
     app: my-app
-  ports:
-  - port: 80
-    targetPort: 3000
+  ports:    
+  - port: {{ .Values.service.Port }}
+    targetPort: {{ .Values.service.targetPort }}    
     protocol: "TCP" 
 
 {{- end }}
