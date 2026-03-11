@@ -4,7 +4,12 @@ image:
   repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   tag: "dev-acd8652"
+=======
+  tag: "dev-21dab60"  
+
+>>>>>>> Stashed changes
 =======
   tag: "dev-21dab60"  
 

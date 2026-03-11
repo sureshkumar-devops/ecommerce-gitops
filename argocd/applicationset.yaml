@@ -33,6 +33,9 @@ spec:
 =======
           valueFiles:
           - environments/{{env}}/values.yaml
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     destination:     
      server: https://kubernetes.default.svc
