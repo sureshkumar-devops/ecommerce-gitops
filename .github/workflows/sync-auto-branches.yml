@@ -1,0 +1,61 @@
+name: Sync Dev → Staging → Master
+on:
+  push:
+    branches:
+      - dev
+    paths-ignore:
+      - 'environments/**'
+
+permissions:
+  contents: write
+
+jobs:
+  sync-gitops-repo:
+     runs-on: ubuntu-latest
+     
+     steps:
+     - name: Checkout GitOps Repo
+       uses: actions/checkout@v5
+       with:
+         repository: sureshkumar-devops/ecommerce-gitops         
+         token: ${{ secrets.GITOPS_TOKEN }}   
+         fetch-depth: 0
+
+     - name: Dry Run and Force Overwrite 
+       run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # 1. Fetch ALL branches and prune deleted ones
+          git fetch --all --prune
+          
+          TARGETS=("staging" "master")         
+          for BRANCH in "${TARGETS[@]}"; do
+            echo "==================================="    
+            echo "🔍 PREVIEWING CHANGES FOR: $BRANCH "
+            echo "==================================="
+
+            # 2. Checkout target branch and reset it to match origin exactly
+            git checkout $BRANCH
+            git reset --hard origin/$BRANCH
+
+            # 3. FORCE OVERWRITE using the remote reference 'origin/dev'
+            git checkout origin/dev -- .
+
+            # 4. Restore the environment-specific values.yaml
+            # This keeps your specific image tags for that environment
+            git checkout HEAD -- environments/
+
+            # 5. Check for changes, commit, and push            
+            if ! git diff --staged --quiet; then
+               echo "The following changes will be pushed to $BRANCH:"
+               git diff --staged --stat
+
+               # COMMIT AND PUSH
+               git commit -m "Force sync from dev (Preserved environments/)"
+               git push origin $BRANCH
+               echo "✅ $BRANCH updated successfully."
+            else
+               echo "ℹ️ $BRANCH already matches up-to-date with dev. No changes to push."               
+            fi            
+          done
