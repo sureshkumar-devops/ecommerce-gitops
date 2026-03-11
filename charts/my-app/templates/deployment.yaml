@@ -1,57 +1,42 @@
 {{- if eq .Values.deploymentStrategy "deployment" }}
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "my-app.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "my-app.labels" . | nindent 4 }}
+    app: my-app
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
-      {{- include "my-app.selectorLabels" . | nindent 6 }}
+      app: my-app
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
-        {{- include "my-app.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        app: my-app
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "my-app.serviceAccountName" . }}
-      {{- with .Values.podSecurityContext }}
-      securityContext:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          {{- with .Values.securityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: app-port              
-              containerPort: {{ .Values.containerPort }}              
-              protocol: TCP
+            - name: http
+              containerPort: {{ .Values.containerPort }}
           readinessProbe:
             httpGet:
-               path: /health
-               port: {{ .Values.containerPort }}
+              path: {{ .Values.probePath }}
+              port: {{ .Values.containerPort }}
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default 10 }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default 2 }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds | default 10 }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold | default 3 }}
           livenessProbe:
             httpGet:
-               path: /health
-               port: {{ .Values.containerPort }}
-{{- end }}      
+              path: {{ .Values.probePath }}
+              port: {{ .Values.containerPort }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default 20 }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default 2 }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds | default 10 }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold | default 3 }}
+{{- end }}
