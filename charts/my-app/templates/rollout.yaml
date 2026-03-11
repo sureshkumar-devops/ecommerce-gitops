@@ -12,9 +12,9 @@ spec:
     stableService: {{ include "my-app.fullname" . }}
     steps:
     - setWeight: 20
-    - pause: { duration: 60s }
+    - pause: { duration: 30s }
     - setWeight: 50
-    - pause: { duration: 60s }  
+    - pause: { duration: 30s }  
     - setWeight: 100
  selector:
    matchLabels:
@@ -29,18 +29,6 @@ spec:
       image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}" # <-- promoted tag from Dev
       imagePullPolicy: {{ .Values.image.pullPolicy }}  
       ports:
-        - containerPort: 80
-      readinessProbe:
-        httpGet:
-          path: /health
-          port: 8080
-        initialDelaySeconds: 10
-        periodSeconds: 5
-      livenessProbe:
-        httpGet:
-          path: /health
-          port: 8080
-        initialDelaySeconds: 20
-        periodSeconds: 10   
+        - containerPort: 80   
 {{- end }}        
 
