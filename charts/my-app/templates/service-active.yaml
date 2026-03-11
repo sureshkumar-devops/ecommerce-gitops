@@ -1,15 +1,18 @@
 {{- if eq .Values.deploymentStrategy "bluegreen" }}
-
 apiVersion: v1
 kind: Service
 metadata:
-  name: my-app-active
+ # Matches 'activeService' in rollout-bluegreen.yaml
+  name: {{ include "my-app.fullname" . }}-active
+  labels:
+    {{- include "my-app.labels" . | nindent 4 }}
 spec:
   selector:
     app: my-app
-  ports:    
-  - port: {{ .Values.service.Port }}
-    targetPort: {{ .Values.service.targetPort }}    
-    protocol: "TCP" 
-
+  type: {{ .Values.service.type | default "ClusterIP" }}
+  ports:
+    - port: {{ .Values.service.port | default 80 }}
+      targetPort: {{ .Values.containerPort | default 3000 }}
+      protocol: TCP
+      name: http
 {{- end }}
