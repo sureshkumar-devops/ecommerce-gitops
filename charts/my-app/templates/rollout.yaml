@@ -1,51 +1,52 @@
 {{- if eq .Values.deploymentStrategy "canary" }}
-# Canary Rollout for staging
+# Canary Rollout
 
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: {{ include "my-app.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: my-app
 spec:
- replicas: {{ .Values.replicaCount }}
- strategy:
-  canary:  
-    stableService: {{ include "my-app.fullname" . }}
-    steps:
-    - setWeight: 20
-    - pause: { duration: 30s }
-    - setWeight: 50
-    - pause: { duration: 30s }  
-    - setWeight: 100
- selector:
-   matchLabels:
-     app: my-app
- template:
-  metadata:
-    labels:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    canary:
+      steps:
+        - setWeight: 20
+        - pause: { duration: 30s }
+        - setWeight: 50
+        - pause: { duration: 30s }
+        - setWeight: 100
+  selector:
+    matchLabels:
       app: my-app
-  spec:
-    containers:
-    - name: {{ .Chart.Name }}
-      image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}" # <-- promoted tag from Dev
-      imagePullPolicy: {{ .Values.image.pullPolicy }}  
-      ports:
-        - containerPort: {{ .Values.containerPort }}
-      readinessProbe:
-        httpGet:
-           path: /index.html
-           port: 3000
-        initialDelaySeconds: 10
-        timeoutSeconds: 2
-        periodSeconds: 10
-        failureThreshold: 3
-      livenessProbe:
-        httpGet:
-           path: /index.html
-           port: 3000
-        initialDelaySeconds: 10
-        timeoutSeconds: 2
-        periodSeconds: 10
-        failureThreshold: 3
-     
-{{- end }}        
-
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPort }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probePath }}
+              port: {{ .Values.containerPort }}
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default 10 }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default 2 }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds | default 10 }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold | default 3 }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probePath }}
+              port: {{ .Values.containerPort }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default 20 }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default 2 }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds | default 10 }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold | default 3 }}
+{{- end }}
