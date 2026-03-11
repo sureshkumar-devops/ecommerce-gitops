@@ -3,8 +3,7 @@ replicaCount: 1
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
-  tag: "dev-21dab60"
-
+  tag: "dev-c3e5504"  # leave empty, environment files will override
 
 deploymentStrategy: deployment
 # options:

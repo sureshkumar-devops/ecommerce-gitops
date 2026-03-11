@@ -1,9 +1,12 @@
+{{- if eq .Values.deploymentStrategy "canary" }}
+# Canary Rollout for staging
+
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
-  name: my-app
+  name: {{ include "my-app.fullname" . }}
 spec:
- replicas: 3
+ replicas: {{ .Values.replicaCount }}
  strategy:
   canary:  
     steps:
@@ -11,8 +14,7 @@ spec:
     - pause: { duration: 30s }
     - setWeight: 50
     - pause: { duration: 30s }
-    - setWegith: 100
-
+    - setWeigth: 100
  selector:
    matchLabels:
      app: my-app
@@ -21,7 +23,23 @@ spec:
     labels:
       app: my-app
   spec:
-    container:
-    - name: my-app-c2
-      image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+    containers:
+    - name: {{ .Chart.Name }}
+      image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}" # <-- promoted tag from Dev
+      imagePullPolicy: {{ .Values.image.pullPolicy }}  
+      ports:
+        - containerPort: 80
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 5
+        periodSeconds: 10
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 15
+        periodSeconds: 20    
+{{- end }}        
 
