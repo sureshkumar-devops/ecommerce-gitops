@@ -1,7 +1,5 @@
 replicaCount: 3
-
 deploymentStrategy: bluegreen
-
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
