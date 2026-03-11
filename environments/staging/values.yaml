@@ -4,3 +4,4 @@ image:
   repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
   tag: "dev-c2effb9"
+  
