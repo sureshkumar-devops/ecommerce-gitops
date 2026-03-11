@@ -2,11 +2,10 @@ name: Sync Dev → Staging → Master
 on:
   push:
     branches:
-      - dev      
-    paths:
-     - '**'              # Include all files
-     - '!environments/**' # EXCLUDE the environments folder
-     
+      - dev
+    paths-ignore:
+      - 'environments/**'
+
 permissions:
   contents: write
 
