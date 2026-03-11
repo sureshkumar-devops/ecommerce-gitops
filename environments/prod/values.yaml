@@ -3,5 +3,5 @@ deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: IfNotPresent
-  tag: "dev-acd8652"
+  tag: "dev-41a322f"
 
