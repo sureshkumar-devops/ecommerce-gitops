@@ -21,7 +21,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
+            - name: http-deploy
               containerPort: {{ .Values.containerPort }}
           readinessProbe:
             httpGet:
