@@ -1,6 +1,20 @@
-replicaCount: 2
 deploymentStrategy: canary
+containerPort: 3000 # matches app inside container
+probePath: /  # <--- DO NOT use /health if your app doesn't have it!
+
+replicaCount: 2
 image:
   repository: lehardocker/ecommerce-app
-  pullPolicy: IfNotPresent
-  tag: "dev-acd8652"
+  tag: "dev-dcae671"
+  pullPolicy: Always
+
+service:
+  port: 80          # external service port
+  targetPort: 3000  # matches app inside container
+
+# Provide defaults for the probes
+readinessProbe:
+  initialDelaySeconds: 5
+livenessProbe:
+  initialDelaySeconds: 15
+

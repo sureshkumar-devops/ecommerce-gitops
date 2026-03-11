@@ -1,8 +1,16 @@
 replicaCount: 1
-
 deploymentStrategy: deployment
-
 image:
-  repository: lehardocker/gitops-app
-  pullPolicy: IfNotPresent
-  tag: "dev-a3cf538"
+  repository: lehardocker/ecommerce-app
+  pullPolicy: Always
+  tag: "dev-dcae671" # Image Updater will replace this with dev-<sha>
+service:
+  port: 80 # external service port
+  targetPort: 3000 # matches app inside container
+containerPort: 3000 # matches app inside container
+probePath: /
+# Provide defaults for the probes
+readinessProbe:
+  initialDelaySeconds: 5
+livenessProbe:
+  initialDelaySeconds: 15
