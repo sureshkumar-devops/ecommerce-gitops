@@ -2,6 +2,8 @@ replicaCount: 2
 deploymentStrategy: canary
 image:
   repository: lehardocker/ecommerce-app
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   tag: "dev-9752e57"
-  
+service:
+  port: 8080
+  targetPort: 8080
