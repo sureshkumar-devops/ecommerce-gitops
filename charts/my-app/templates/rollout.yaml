@@ -1,15 +1,14 @@
 {{- if eq .Values.deploymentStrategy "canary" }}
-# Canary Rollout
-
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: {{ include "my-app.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app: my-app
+    {{- include "my-app.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  # The strategy defines how the canary rollout progresses
   strategy:
     canary:
       steps:
@@ -20,11 +19,11 @@ spec:
         - setWeight: 100
   selector:
     matchLabels:
-      app: my-app
+      {{- include "my-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: my-app
+        {{- include "my-app.selectorLabels" . | nindent 8 }}
     spec:
       containers:
         - name: {{ .Chart.Name }}
@@ -33,9 +32,11 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.containerPort }}
+              protocol: TCP
+          # Use / as the path if /health doesn't exist in your code
           readinessProbe:
             httpGet:
-              path: {{ .Values.probePath }}
+              path: {{ .Values.probePath | default "/" }}
               port: {{ .Values.containerPort }}
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default 10 }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default 2 }}
@@ -43,10 +44,12 @@ spec:
             failureThreshold: {{ .Values.readinessProbe.failureThreshold | default 3 }}
           livenessProbe:
             httpGet:
-              path: {{ .Values.probePath }}
+              path: {{ .Values.probePath | default "/" }}
               port: {{ .Values.containerPort }}
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default 20 }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default 2 }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds | default 10 }}
             failureThreshold: {{ .Values.livenessProbe.failureThreshold | default 3 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
 {{- end }}
