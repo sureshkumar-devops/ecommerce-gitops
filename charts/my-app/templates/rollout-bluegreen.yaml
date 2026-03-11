@@ -5,7 +5,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
-  name: my-app
+  name: {{ include "my-app.fullname" . }}
 spec:
   replicas: 3
   strategy:
