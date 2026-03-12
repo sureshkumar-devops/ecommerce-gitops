@@ -1,0 +1,47 @@
+name: Sync Dev → Staging → Master
+on:
+   workflow_call:
+      inputs:
+        branch:
+          required: true
+          type: string
+      secrets:   
+         GITOPS_TOKEN:
+          required: true
+jobs:
+    sync-gitops-repo:
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: Checkout Gitops Repo        
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITOPS_TOKEN }}
+          fetch-depth: 0
+
+      - name: Sync Branches
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@user.noreply.github.com"
+
+          git fetch --all --prune  
+          TARGETS=("staging" "master")
+
+          for BRANCH in "${TARGETS[@]}" ; do
+            echo  "🔄 Syncing $BRANCH with dev (excluding environments/)"
+            git checkout $BRANCH
+            git reset --hard origin/$BRANCH
+
+            # Copy everything from dev except environments/
+            git checkout origin/dev -- .
+            git checkout HEAD -- environments/
+
+            git add .
+             if ! git diff --cached --quiet; then
+              git commit -m "Sync from dev → $BRANCH (excluding environments/)"
+              git push origin $BRANCH
+              echo "✅ $BRANCH updated."
+            else
+              echo "ℹ️ $BRANCH already up-to-date."
+            fi
+          done
