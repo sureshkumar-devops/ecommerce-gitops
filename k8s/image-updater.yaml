@@ -10,16 +10,20 @@ spec:
     gitConfig:
       repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
       branch: "dev"
-      writeBackTarget: "helmvalues:../../environments/dev/values.yaml"  
+      writeBackTarget: "helmvalues:../../environments/{{env}}/values.yaml"  
   applicationRefs:
-    - namePattern: "*-my-app"      
+    - namePattern: "{{env}}-my-app"      
       images:
         - alias: "app"
           imageName: "lehardocker/ecommerce-app"
           commonUpdateSettings:
-            updateStrategy: "latest"
+            updateStrategy: "digest"
             allowTags: "regexp:^dev-.*"
             pullSecret: "secret:argocd/dockerhub-creds"  
+            writeTag: |
+              {{ if eq .Env "dev" }}{{ .Tag }}{{ end }}
+              {{ if eq .Env "staging" }}stag-{{ .TagSuffix }}{{ end }}
+              {{ if eq .Env "prod" }}v1.2.0-{{ .TagSuffix }}{{ end }}
           manifestTargets:
             helm:
               name: "image.repository"
