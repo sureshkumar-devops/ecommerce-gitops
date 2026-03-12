@@ -1,30 +1,67 @@
 apiVersion: argocd-image-updater.argoproj.io/v1alpha1
 kind: ImageUpdater
 metadata:
-  name: ecommerce-image-updater  
+  name: ecommerce-image-updater
   namespace: argocd
+  labels:
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
+    environment: gitops
 spec:
-  namespace: argocd        
+  namespace: argocd
   writeBackConfig:
     method: "git:secret:argocd/git-creds"
     gitConfig:
       repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
-      branch: "dev"
-      writeBackTarget: "helmvalues:../../environments/dev/values.yaml"  
+
   applicationRefs:
-    - namePattern: "*-my-app"      
+    # DEV
+    - namePattern: "dev-my-app"
       images:
         - alias: "app"
           imageName: "lehardocker/ecommerce-app"
           commonUpdateSettings:
-            updateStrategy: "latest"
+            updateStrategy: "newest-build"
             allowTags: "regexp:^dev-.*"
-            pullSecret: "secret:argocd/dockerhub-creds"  
           manifestTargets:
             helm:
               name: "image.repository"
               tag: "image.tag"
+      writeBackConfig:
+        gitConfig:
+          branch: "dev"
+          writeBackTarget: "helmvalues:../../environments/dev/values.yaml"
 
-             
+    # STAGING
+    - namePattern: "staging-my-app"
+      images:
+        - alias: "app"
+          imageName: "lehardocker/ecommerce-app"
+          commonUpdateSettings:
+            updateStrategy: "newest-build"
+            allowTags: "regexp:^stag-.*"
+          manifestTargets:
+            helm:
+              name: "image.repository"
+              tag: "image.tag"
+      writeBackConfig:
+        gitConfig:
+          branch: "staging"
+          writeBackTarget: "helmvalues:../../environments/staging/values.yaml"
 
-            
+    # PROD
+    - namePattern: "prod-my-app"
+      images:
+        - alias: "app"
+          imageName: "lehardocker/ecommerce-app"
+          commonUpdateSettings:
+            updateStrategy: "newest-build"
+            allowTags: "regexp:^v[0-9]+\\.[0-9]+\\.[0-9]+-.*"
+          manifestTargets:
+            helm:
+              name: "image.repository"
+              tag: "image.tag"
+      writeBackConfig:
+        gitConfig:
+          branch: "master"
+          writeBackTarget: "helmvalues:../../environments/prod/values.yaml"
