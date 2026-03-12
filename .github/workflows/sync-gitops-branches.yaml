@@ -34,7 +34,8 @@ jobs:
 
             # Copy everything from dev except environments/
             git checkout origin/dev -- .
-            git checkout HEAD -- environments/
+            git restore --staged environments/
+            git checkout $BRANCH -- environments/            
 
             git add .
              if ! git diff --cached --quiet; then
