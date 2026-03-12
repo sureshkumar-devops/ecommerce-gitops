@@ -9,8 +9,22 @@ metadata:
     environment: gitops
 spec:
   namespace: argocd
-  applicationRefs:
+   # --- GLOBAL CONFIG (Used by all environments) ---
+  config:
+    git.commit.user: "argocd-image-updater"
+    git.commit.email: "argocd-image-updater@user.noreply@argoproj.io"
+    git.commit-message-template: |
+      chore(image): update {{ .AppName }} 
+
+      {{ range .AppChanges -}}
+      Environment: {{ $.AppName }}
+      Image: {{ .Image.Name }}
+      Previous Tag: {{ .OldTag }}
+      New Tag: {{ .NewTag }}
+      {{ end -}}
+
   
+  applicationRefs:  
     #------------ DEVELOPMENT --------------------
     - namePattern: "dev-my-app"
       images:
@@ -29,6 +43,8 @@ spec:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
           branch: "dev"
           writeBackTarget: "environments/dev/values.yaml"
+          #writeBackTarget: "helmvalues:environments/dev/values.yaml"
+          #commitMessage: "[ImageUpdater] {{app}} → {{image}}:{{newTag}} (env=dev)"
 
    # --- STAGING ---
     - namePattern: "staging-my-app"
