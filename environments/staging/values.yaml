@@ -5,7 +5,7 @@ probePath: /  # <--- DO NOT use /health if your app doesn't have it!
 replicaCount: 2
 image:
   repository: lehardocker/ecommerce-app
-  tag: "dev-dcae671"
+  tag: "dev-59c547e"
   pullPolicy: Always
 
 service:
