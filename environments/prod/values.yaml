@@ -3,7 +3,7 @@ deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: Always
-  tag: "v2026.03.12-d6842e0"
+  tag: "v2026.03.12-f15f87e"
 service:
   port: 80 # external service port
   targetPort: 3000 # matches app inside container
