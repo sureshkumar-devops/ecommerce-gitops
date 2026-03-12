@@ -16,8 +16,8 @@ jobs:
       - name: Checkout Gitops Repo        
         uses: actions/checkout@v4
         with:
-          repository: sureshkumar-devops/ecommerce-gitops
           token: ${{ secrets.GITOPS_TOKEN }}
+          repository: sureshkumar-devops/ecommerce-gitops
           fetch-depth: 0
 
       - name: Sync Branches
@@ -36,7 +36,7 @@ jobs:
             # Copy everything from dev except environments/
             git checkout origin/dev -- .
             git restore --staged environments/
-            git checkout $BRANCH -- environments/            
+            git checkout $BRANCH -- environments/               
 
             git add .
              if ! git diff --cached --quiet; then
