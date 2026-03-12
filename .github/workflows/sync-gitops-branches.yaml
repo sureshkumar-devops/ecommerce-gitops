@@ -3,10 +3,17 @@ on:
    workflow_call:
       inputs:
         branch:
+          description: "Branch to sync (dev, staging, prod)"
           required: true
           type: string
+        commitMessage:        
+         description: "Commit message format"
+         required: false
+         type: string
+         default: "[ImageUpdater] Updated image for ${{ inputs.branch }}"
       secrets:   
          GITOPS_TOKEN:
+          description: "Token for pushing changes to GitOps repo"
           required: true
 jobs:
     sync-gitops-repo:
@@ -18,6 +25,7 @@ jobs:
         with:
           token: ${{ secrets.GITOPS_TOKEN }}
           repository: sureshkumar-devops/ecommerce-gitops
+          ref: ${{ inputs.branch }}
           fetch-depth: 0
 
       - name: Sync Branches
