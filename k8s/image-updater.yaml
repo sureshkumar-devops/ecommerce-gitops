@@ -28,7 +28,7 @@ spec:
         gitConfig:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
           branch: "dev"
-          writeBackTarget: "helmvalues:environments/dev/values.yaml"
+          writeBackTarget: "environments/dev/values.yaml"
 
    # --- STAGING ---
     - namePattern: "staging-my-app"
