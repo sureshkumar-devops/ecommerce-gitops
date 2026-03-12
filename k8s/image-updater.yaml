@@ -30,7 +30,7 @@ spec:
       writeBackConfig:
         gitConfig:
           branch: "dev"
-          writeBackTarget: "helmvalues:../../environments/dev/values.yaml"
+          writeBackTarget: "helmvalues:environments/dev/values.yaml"
 
     # STAGING
     - namePattern: "staging-my-app"
