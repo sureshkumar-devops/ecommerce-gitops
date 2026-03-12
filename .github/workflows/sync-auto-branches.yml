@@ -1,11 +1,18 @@
 name: Sync Dev → Staging → Master
 on:
-  push:
-    branches:
-      - dev
-    paths:
-      - '**'              # Include all files
-      - '!environments/**' # EXCLUDE the environments folder
+   workflow_dispatch:
+      inputs:
+        target: 
+          description: "sync folder exclude env folder"
+          required: true
+          default: dev
+          type: string
+  # push:
+  #  branches:
+  #   - dev
+  #  paths:
+  #    - '**'              # Include all files
+  #    - '!environments/**' # EXCLUDE the environments folder
 
 permissions:
   contents: write
