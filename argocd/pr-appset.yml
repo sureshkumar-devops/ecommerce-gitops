@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: pr-appset
+spec:
+  generators:
+   - pullRequest:
+       github:
+         owner: sureshkumar-devops
+         repo: ecommerce-gitops
+         tokenRef: 
+            secretName: github-token
+            key: token
+       requeueAfterSeconds: 300
+  template:
+    metadata:
+      name: preview-pr-{{number}}-my-app
+    spec:
+    project: default
+
+    source:
+      repoURL:https://github.com/sureshkumar-devops/ecommerce-gitops.git
+      targetRevision: {{head_sha}}
+      path: charts/my-app  
+      helm:
+       valueFiles:
+         - environments/preview/values.yaml   
+
+    desination:    
+      server: https://kubernetes.default.svc
+      namespace: preview-pr-{{number}}  
+      
+    syncPolicy:
+      automated:
+        selfHeal: true
+        prune: true
+      syncOptions:
+        - createNamespace=true
+
+
+

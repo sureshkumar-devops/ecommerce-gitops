@@ -1,0 +1,8 @@
+replicaCount: 1
+
+deploymentStrategy: bluegreen
+
+image:
+  repository: lehardocker/ecommerce-app
+  pullPolicy: Always
+  tag: "dev-a3cf538"  
