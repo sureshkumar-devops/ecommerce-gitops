@@ -11,10 +11,14 @@ spec:
          tokenRef: 
             secretName: github-token
             key: token
+         labels:
+          - preview     
        requeueAfterSeconds: 300
   template:
     metadata:
       name: preview-pr-{{number}}-my-app
+      labels:
+         previews.argocd.argoproj.io/enabled: "true"
     spec:
     project: default
 
