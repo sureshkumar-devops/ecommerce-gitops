@@ -7,7 +7,7 @@ spec:
    - pullRequest:
        github:
          owner: sureshkumar-devops
-         repo: ecommerce-gitops
+         repo: ecommerce-app
          tokenRef: 
             secretName: github-token
             key: token
