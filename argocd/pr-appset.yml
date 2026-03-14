@@ -2,38 +2,38 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: pr-appset
+  namespace: argocd
 spec:
   generators:
-   - pullRequest:
-       github:
-         owner: sureshkumar-devops
-         repo: ecommerce-app
-         tokenRef: 
+    - pullRequest:
+        github:
+          owner: sureshkumar-devops
+          repo: ecommerce-app
+          tokenRef:
             secretName: github-token
             key: token
-         labels:
-          - preview     
-       requeueAfterSeconds: 300
+        requeueAfterSeconds: 60
   template:
     metadata:
       name: "preview-pr-{{number}}-my-app"
       labels:
-         previews.argocd.argoproj.io/enabled: "true"
+        previews.argocd.argoproj.io/enabled: "true"
     spec:
       project: default
       source:
-        repoURL: https://github.com/sureshkumar-devops/ecommerce-gitops.git
-        targetRevision: "{{head_sha}}"
-        path: charts/my-app  
+        repoURL: https://github.com
+        targetRevision: "{{head_sha}}" # Points to the specific code in the PR
+        path: charts/my-app
         helm:
           valueFiles:
-            - environments/preview/values.yaml   
-      destination:    
+            - environments/preview/values.yaml
+      destination:
         server: https://kubernetes.default.svc
-        namespace: preview-pr-{{number}}        
+        namespace: "preview-pr-{{number}}" # Creates a unique namespace per PR
       syncPolicy:
         automated:
-          selfHeal: true
           prune: true
+          selfHeal: true
         syncOptions:
-          - createNamespace=true
+          - CreateNamespace=true # Essential: tells Argo CD to create the namespace if it doesn't exist
+
