@@ -9,8 +9,8 @@ spec:
          owner: sureshkumar-devops
          repo: ecommerce-gitops
          tokenRef: 
-            secretName: github-token
-            key: token
+            secretName: git-creds
+            key: password
        requeueAfterSeconds: 300
   template:
     metadata:
