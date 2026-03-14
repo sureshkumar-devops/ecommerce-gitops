@@ -11,31 +11,29 @@ spec:
          tokenRef: 
             secretName: github-token
             key: token
+         labels:
+          - preview     
        requeueAfterSeconds: 300
   template:
     metadata:
-      name: preview-pr-{{number}}-my-app
+      name: "preview-pr-{{number}}-my-app"
+      labels:
+         previews.argocd.argoproj.io/enabled: "true"
     spec:
-    project: default
-
-    source:
-      repoURL:https://github.com/sureshkumar-devops/ecommerce-gitops.git
-      targetRevision: {{head_sha}}
-      path: charts/my-app  
-      helm:
-       valueFiles:
-         - environments/preview/values.yaml   
-
-    desination:    
-      server: https://kubernetes.default.svc
-      namespace: preview-pr-{{number}}  
-      
-    syncPolicy:
-      automated:
-        selfHeal: true
-        prune: true
-      syncOptions:
-        - createNamespace=true
-
-
-
+      project: default
+      source:
+        repoURL: https://github.com/sureshkumar-devops/ecommerce-gitops.git
+        targetRevision: "{{head_sha}}"
+        path: charts/my-app  
+        helm:
+          valueFiles:
+            - environments/preview/values.yaml   
+      destination:    
+        server: https://kubernetes.default.svc
+        namespace: preview-pr-{{number}}        
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true
+        syncOptions:
+          - createNamespace=true
