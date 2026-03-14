@@ -4,7 +4,7 @@ probePath: / # <--- DO NOT use /health if your app doesn't have it!
 replicaCount: 2
 image:
   repository: lehardocker/ecommerce-app
-  tag: "stag-5700d62"
+  tag: "stag-2f271f0"
   pullPolicy: Always
 service:
   port: 80 # external service port
