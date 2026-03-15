@@ -3,7 +3,7 @@ deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: Always
-  tag: "dev-dcae671" # Image Updater will replace this with dev-<sha>
+  tag: "dev-30b6b65" # Image Updater will replace this with dev-<sha>
 service:
   port: 80 # external service port
   targetPort: 3000 # matches app inside container
