@@ -16,6 +16,7 @@ spec:
   template:
     metadata:
       name: "preview-pr-{{number}}-my-app"
+      namespace: argocd  
       labels:
         previews.argocd.argoproj.io/enabled: "true"
     spec:
@@ -26,7 +27,7 @@ spec:
         path: charts/my-app
         helm:
           valueFiles:
-            - environments/preview/values.yaml
+            - ../../environments/preview/values.yaml
       destination:
         server: https://kubernetes.default.svc
         namespace: "preview-pr-{{number}}" # Creates a unique namespace per PR

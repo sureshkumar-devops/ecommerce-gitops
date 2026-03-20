@@ -3,12 +3,12 @@ apiVersion: v1
 kind: Service
 metadata:
  # Matches 'activeService' in rollout-bluegreen.yaml
-  name: {{ include "my-app.fullname" . }}-active
+  name: {{ .Release.Namespace }}-svc-{{ .Chart.Name }}-active
   labels:
-    {{- include "my-app.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ .Chart.Name }}
 spec:
-  selector:
-    app: my-app
+  selector:  
+    app.kubernetes.io/name: {{ .Chart.Name }}  
   type: {{ .Values.service.type | default "ClusterIP" }}
   ports:
     - port: {{ .Values.service.port | default 80 }}
