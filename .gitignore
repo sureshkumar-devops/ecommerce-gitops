@@ -1,6 +1,8 @@
 # Ignore the manual K8s manifests containing secrets
 k8s/dockerhub-creds.yaml
 k8s/git-creds.yaml
+k8s/tls.crt
+k8s/tls.key
 
 # Ignore environment-specific secrets if any
 environments/*/secrets.yaml
