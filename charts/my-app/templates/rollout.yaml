@@ -23,7 +23,7 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "my-app.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/name: {{ .Chart.Name }}
     spec:
       containers:
         - name: {{ .Chart.Name }}

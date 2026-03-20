@@ -2,19 +2,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "my-app.fullname" . }}
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app: my-app
+  name: {{ include "my-app.fullname" . }}  
+  labels:     
+    app.kubernetes.io/name: {{ .Chart.Name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
-    matchLabels:
-      app: my-app
+    matchLabels:        
+      app.kubernetes.io/name: {{ .Chart.Name }}
   template:
     metadata:
-      labels:
-        app: my-app
+     labels:
+      app.kubernetes.io/name: {{ .Chart.Name }} 
     spec:
       containers:
         - name: {{ .Chart.Name }}
