@@ -39,9 +39,9 @@ gateway:
 
 httpRoute:
   enabled: true
-  parentGatewayName: dev-gateway
+  parentGatewayName: staging-gateway
   hostnames:
-    - dev.admedia.com
+    - staging.admedia.com
 
 # --- Cluster-wide Resources ---
 
