@@ -1,26 +1,19 @@
 # --- Global Environment Identifier ---
 
 env: dev
-  
 # --- Deployment / Rollout Settings ---
- 
-replicaCount: 1  
+replicaCount: 1
 deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: Always
-  tag: "dev-2f271f0" # Image Updater will replace this with dev-<sha>
-
-
+  tag: "dev-dca0505" # Image Updater will replace this with dev-<sha>
 # --- Service Configuration ---    
-
 service:
   name: dev-svc-my-app
   port: 80 # external service port
   targetPort: 3000 # matches app inside container
-
 # --- Container & Probe Settings ---
-
 containerPort: 3000 # matches app inside container
 probePath: /
 # Provide defaults for the probes
@@ -28,30 +21,15 @@ readinessProbe:
   initialDelaySeconds: 5
 livenessProbe:
   initialDelaySeconds: 15
-
-
 # --- Gateway API Configuration (The Missing Parts) ---
-
 gateway:
   enabled: true
-  className: nginx  # Matches your GatewayClass name
-
+  className: nginx # Matches your GatewayClass name
 httpRoute:
   enabled: true
   parentGatewayName: dev-gateway
   hostnames:
-    - dev.admedia.com
-
+  - dev.admedia.com
 # --- Cluster-wide Resources ---
-
 gatewayClass:
-  create: true  # Set to true in dev, false in staging/prod to avoid duplicates
-
-
-
-
-
-
-
-
-
+  create: true # Set to true in dev, false in staging/prod to avoid duplicates
