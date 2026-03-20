@@ -37,9 +37,9 @@ gateway:
 
 httpRoute:
   enabled: true
-  parentGatewayName: dev-gateway
+  parentGatewayName: prod-gateway
   hostnames:
-    - dev.admedia.com
+    - prod.admedia.com
 
 # --- Cluster-wide Resources ---
 
