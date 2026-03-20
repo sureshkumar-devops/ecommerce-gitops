@@ -7,8 +7,6 @@ Expand the name of the chart.
 
 {{/*
 Create a default fully qualified app name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
 */}}
 {{- define "my-app.fullname" -}}
 {{- if .Values.fullnameOverride }}
@@ -31,7 +29,7 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
-Common labels
+Common labels (Standard Prefix)
 */}}
 {{- define "my-app.labels" -}}
 helm.sh/chart: {{ include "my-app.chart" . }}
@@ -40,6 +38,16 @@ helm.sh/chart: {{ include "my-app.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- if .Values.env }}
+environment: {{ .Values.env }}
+{{- end }}
+{{- end }}
+
+{{/*
+Common labels (Alias for your HTTPRoute template)
+*/}}
+{{- define "chart.labels" -}}
+{{ include "my-app.labels" . }}
 {{- end }}
 
 {{/*
