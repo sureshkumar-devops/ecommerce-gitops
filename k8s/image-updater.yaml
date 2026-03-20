@@ -8,25 +8,11 @@ metadata:
     app.kubernetes.io/part-of: ecommerce
     environment: gitops
 spec:
+  # This namespace field tells the updater where to look for the Applications
   namespace: argocd
-   # --- GLOBAL CONFIG (Used by all environments) ---
-  config:
-    git.commit.user: "argocd-image-updater"
-    git.commit.email: "argocd-image-updater@user.noreply@argoproj.io"
-    git.commit-message-template: |
-      chore(image): update {{ .AppName }} 
-
-      {{ range .AppChanges -}}
-      Environment: {{ $.AppName }}
-      Image: {{ .Image.Name }}
-      Previous Tag: {{ .OldTag }}
-      New Tag: {{ .NewTag }}
-      {{ end -}}
-
-  
   applicationRefs:  
     #------------ DEVELOPMENT --------------------
-    - namePattern: "dev-my-app"
+    - namePattern: "dev-svc-my-app"
       images:
         - alias: "app"
           imageName: "lehardocker/ecommerce-app"
@@ -47,7 +33,7 @@ spec:
           #commitMessage: "[ImageUpdater] {{app}} → {{image}}:{{newTag}} (env=dev)"
 
    # --- STAGING ---
-    - namePattern: "staging-my-app"
+    - namePattern: "staging-svc-my-app"
       images:
         - alias: "app"
           imageName: "lehardocker/ecommerce-app"
@@ -66,7 +52,7 @@ spec:
           writeBackTarget: "environments/staging/values.yaml"
 
     # --- PRODUCTION ---
-    - namePattern: "prod-my-app"
+    - namePattern: "prod-svc-my-app"
       images:
         - alias: "app"
           imageName: "lehardocker/ecommerce-app"

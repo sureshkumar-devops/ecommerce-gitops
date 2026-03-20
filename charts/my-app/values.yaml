@@ -5,21 +5,30 @@ image:
   pullPolicy: IfNotPresent
   tag: "dev-c3e5504"
 # FIXED: Changed from /health to / to stop the CrashLoop
+
+# Container Configuration
+    
 probePath: / 
 containerPort: 3000
+
 # ADDED: These objects are required by your rollout.yaml template
+
 readinessProbe:
   initialDelaySeconds: 5
   timeoutSeconds: 2
   periodSeconds: 10
   failureThreshold: 3
+
 livenessProbe:
   initialDelaySeconds: 15
   timeoutSeconds: 2
   periodSeconds: 10
   failureThreshold: 3
 
+# --- Service Configuration ---
+    
 service:
+  name: dev-svc-my-app  # Ensure this matches your HTTPRoute backendRef
   type: ClusterIP
   port: 80
   targetPort: 3000
@@ -27,8 +36,42 @@ service:
 serviceAccount:
   create: false
 
+# --- Gateway API Configuration ---
+
+gatewayClass:
+  create: true  # Set to false if the class 'nginx' already exists in the cluster
+
+gateway:
+  enabled: true
+  className: nginx
+
+httpRoute:
+  enabled: true
+  parentGatewayName: dev-gateway
+  hostnames:
+    - dev.admedia.com
+
 ingress:
   enabled: false
+  className: nginx
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+   - host: dev.admedia.com  # Placeholder to be overridden
+     paths:
+     - path: /
+       pathType: Prefix
+       backend: 
+         service:
+           name: dev-my-app
+           port:
+               number: 80
+  tls:  # or Configure TLS if you want HTTPS
+   - hosts:
+        - dev.admedia.com
+     secretName: dev-admedia-tls     
+
+        
 
 autoscaling:
   enabled: false

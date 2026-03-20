@@ -27,6 +27,7 @@ spec:
      targetRevision: '{{branch}}'
      path: charts/my-app
      helm:
+       releaseName: "{{env}}-my-app" 
        valueFiles:
        - environments/{{env}}/values.yaml
     destination:     

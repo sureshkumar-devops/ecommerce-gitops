@@ -15,12 +15,13 @@ data:
         default: true
 
   git.commit.user: "argocd-image-updater"
-  git.commit.email: "argocd@example.com"
+  git.commit.email: "argocd-image-updater@argoproj.io"
 
   git.commit-message-template: |  
     chore(image): update {{ .AppName }} 
 
     {{ range .AppChanges -}}
+    Environment: {{ $.AppName }}
     Image: {{ .Image }}
     Previous Tag: {{ .OldTag }}
     New Tag: {{ .NewTag }}
