@@ -53,7 +53,7 @@ spec:
         gitConfig:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
           branch: "staging"
-          writeBackTarget: "helmvalues:environments/staging/values.yaml"
+          writeBackTarget: "environments/staging/values.yaml"
 
     # --- PRODUCTION ---
     - namePattern: "prod-my-app"
@@ -72,5 +72,5 @@ spec:
         gitConfig:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
           branch: "master"
-          writeBackTarget: "helmvalues:environments/prod/values.yaml"
+          writeBackTarget: "environments/prod/values.yaml"
 
