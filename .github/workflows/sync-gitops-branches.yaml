@@ -35,35 +35,66 @@ jobs:
 
           git fetch origin
 
-          TARGETS=("staging" "master")
+          # Map target branches to their specific environment folders
+          # staging -> environments/staging
+          # master  -> environments/prod
+          declare -A ENV_MAP=( ["staging"]="staging" ["master"]="prod" )
 
-          for BRANCH in "${TARGETS[@]}" ; do
-            echo "🔄 Syncing $BRANCH with dev (Preserving environments/)"
+          for BRANCH in "${!ENV_MAP[@]}" ; do
+            TARGET_FOLDER="environments/${ENV_MAP[$BRANCH]}"
+            echo "🔄 Syncing $BRANCH with dev (Protecting $TARGET_FOLDER)"
 
-            # 1. Switch to target branch and make sure it matches remote
+            # 1. Reset target branch to match remote exactly
             git checkout $BRANCH
             git reset --hard origin/$BRANCH
 
-            # 2. Back up the target branch's 'environments' folder outside the repo
-            # This prevents 'git checkout' from deleting branch-specific folders
-            mkdir -p ../env_backup
-            cp -r environments/* ../env_backup/
-
-            # 3. Force update EVERYTHING from dev branch
+            # 2. Pull EVERYTHING from dev into the current branch
             git checkout origin/dev -- .
 
-            # 4. Restore the branch-specific environment folders
-            # This puts back staging/ or prod/ folders that aren't in dev
-            cp -r ../env_backup/* environments/
-            rm -rf ../env_backup/*
+            # 3. RESTORE the environment-specific folder from the original branch state
+            # This puts the correct values.yaml (with the right image tags) back
+            git checkout HEAD -- "$TARGET_FOLDER"
 
-            # 5. Commit and Push if there are changes
+            # 4. Commit and Push
             git add .
             if ! git diff --cached --quiet; then
-              git commit -m "🚀 Sync: Update all code from dev to $BRANCH (excluding environments/)"
+              git commit -m "🚀 Sync: Update from dev to $BRANCH (Kept $TARGET_FOLDER)"
               git push origin $BRANCH
               echo "✅ $BRANCH updated."
             else
               echo "ℹ️ $BRANCH already up-to-date."
             fi
           done
+
+          #TARGETS=("staging" "master")
+
+          #for BRANCH in "${TARGETS[@]}" ; do
+            #echo "🔄 Syncing $BRANCH with dev (Preserving environments/)"
+
+            ## 1. Switch to target branch and make sure it matches remote
+            #git checkout $BRANCH
+            #git reset --hard origin/$BRANCH
+
+            ## 2. Back up the target branch's 'environments' folder outside the repo
+            ## This prevents 'git checkout' from deleting branch-specific folders
+            #mkdir -p ../env_backup
+            #cp -r environments/* ../env_backup/
+
+            ## 3. Force update EVERYTHING from dev branch
+            #git checkout origin/dev -- .
+
+            ## 4. Restore the branch-specific environment folders
+            ## This puts back staging/ or prod/ folders that aren't in dev
+            #cp -r ../env_backup/* environments/
+            #rm -rf ../env_backup/*
+
+            ## 5. Commit and Push if there are changes
+            #git add .
+            #if ! git diff --cached --quiet; then
+              #git commit -m "🚀 Sync: Update all code from dev to $BRANCH (excluding environments/)"
+              #git push origin $BRANCH
+              #echo "✅ $BRANCH updated."
+            #else
+              #echo "ℹ️ $BRANCH already up-to-date."
+            #fi
+          #done
