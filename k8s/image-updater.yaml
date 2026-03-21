@@ -10,9 +10,15 @@ metadata:
 spec:
   # This namespace field tells the updater where to look for the Applications
   namespace: argocd
+  writeBackConfig:
+    method: "git:secret:argocd/git-creds"
+    gitConfig:
+      repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
+
+
   applicationRefs:  
     #------------ DEVELOPMENT --------------------
-    - namePattern: "dev-svc-my-app"
+    - namePattern: "dev-my-app"
       images:
         - alias: "app"
           imageName: "lehardocker/ecommerce-app"
@@ -29,11 +35,10 @@ spec:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
           branch: "dev"
           writeBackTarget: "environments/dev/values.yaml"
-          #writeBackTarget: "helmvalues:environments/dev/values.yaml"
-          #commitMessage: "[ImageUpdater] {{app}} → {{image}}:{{newTag}} (env=dev)"
+            #writeBackTarget: "helmvalues:environments/dev/values.yaml"          
 
    # --- STAGING ---
-    - namePattern: "staging-svc-my-app"
+    - namePattern: "staging-my-app"
       images:
         - alias: "app"
           imageName: "lehardocker/ecommerce-app"
@@ -52,7 +57,7 @@ spec:
           writeBackTarget: "environments/staging/values.yaml"
 
     # --- PRODUCTION ---
-    - namePattern: "prod-svc-my-app"
+    - namePattern: "prod-my-app"
       images:
         - alias: "app"
           imageName: "lehardocker/ecommerce-app"
