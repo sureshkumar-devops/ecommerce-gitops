@@ -1,3 +1,7 @@
+# --- Global Environment Identifier ---
+
+env: ""
+
 replicaCount: 1   # Canary needs at least 2 to show the split (e.g., 1 old, 1 new)
 deploymentStrategy: deployment
 image:
