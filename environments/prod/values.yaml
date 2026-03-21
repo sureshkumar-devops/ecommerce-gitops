@@ -9,7 +9,7 @@ deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: Always
-  tag: "v2026.03.20-32b66e9" # Image Updater will replace this with dev-<sha>
+  tag: "dev-87abe23"
 
 # --- Service Configuration ---
      
