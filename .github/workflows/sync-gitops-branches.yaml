@@ -1,25 +1,25 @@
 name: Sync Dev → Staging → Master
 on:
-   workflow_call:
-      inputs:
-        branch:
-          description: "Branch to sync (dev, staging, prod)"
-          required: true
-          type: string
-        commitMessage:        
-         description: "Commit message format"
-         required: false
-         type: string
-         default: "[ImageUpdater] Updated image for ${{ inputs.branch }}"
-      secrets:   
-         GITOPS_TOKEN:
-          description: "Token for pushing changes to GitOps repo"
-          required: true
-jobs:
-    sync-gitops-repo:
-      runs-on: ubuntu-latest
+  workflow_call:
+    inputs:
+      branch:
+        description: "Branch to sync (dev, staging, prod)"
+        required: true
+        type: string
+      commitMessage:        
+        description: "Commit message format"
+        required: false
+        type: string
+        default: "[ImageUpdater] Updated image for ${{ inputs.branch }}"
+    secrets:   
+      GITOPS_TOKEN:
+        description: "Token for pushing changes to GitOps repo"
+        required: true
 
-      steps:
+jobs:
+  sync-gitops-repo:
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout Gitops Repo        
         uses: actions/checkout@v4
         with:
@@ -33,34 +33,34 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@user.noreply.github.com"
 
-          #git fetch --all --prune  
           git fetch origin
 
           TARGETS=("staging" "master")
 
           for BRANCH in "${TARGETS[@]}" ; do
-            echo  "🔄 Syncing $BRANCH with dev (excluding environments/)"
+            echo "🔄 Syncing $BRANCH with dev (Preserving environments/)"
 
-            # Switch to the target branch and ensure it's fresh
+            # 1. Switch to target branch and make sure it matches remote
             git checkout $BRANCH
             git reset --hard origin/$BRANCH
 
-            # 1. Start a merge from dev but DON'T commit yet
-            git merge origin/dev --no-commit --no-ff || true
+            # 2. Back up the target branch's 'environments' folder outside the repo
+            # This prevents 'git checkout' from deleting branch-specific folders
+            mkdir -p ../env_backup
+            cp -r environments/* ../env_backup/
 
-            # 2. Force the environments/ folder to stay exactly as it is on the TARGET branch
-            # This 'restores' the branch's original environment folder, preventing deletions.
-            git checkout HEAD -- environments/
-                     
-            # Copy everything from dev except environments/
-            #git checkout origin/dev -- .
-            #git restore --staged environments/
-            #git checkout $BRANCH -- environments/               
+            # 3. Force update EVERYTHING from dev branch
+            git checkout origin/dev -- .
 
-            # 3. Finalize the sync            
+            # 4. Restore the branch-specific environment folders
+            # This puts back staging/ or prod/ folders that aren't in dev
+            cp -r ../env_backup/* environments/
+            rm -rf ../env_backup/*
+
+            # 5. Commit and Push if there are changes
             git add .
-             if ! git diff --cached --quiet; then
-              git commit -m "Sync from dev → $BRANCH (excluding environments/)"
+            if ! git diff --cached --quiet; then
+              git commit -m "🚀 Sync: Update all code from dev to $BRANCH (excluding environments/)"
               git push origin $BRANCH
               echo "✅ $BRANCH updated."
             else
