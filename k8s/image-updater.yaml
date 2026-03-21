@@ -33,7 +33,7 @@ spec:
     #------------ DEVELOPMENT --------------------
     - namePattern: "dev-my-app"
       images:
-        - alias: "app-dev"
+        - alias: "app"
           imageName: "lehardocker/ecommerce-app"
           commonUpdateSettings:
             updateStrategy: "newest-build"
@@ -52,7 +52,7 @@ spec:
    # --- STAGING ---
     - namePattern: "staging-my-app"
       images:
-        - alias: "app-stag"
+        - alias: "app"
           imageName: "lehardocker/ecommerce-app"
           commonUpdateSettings:
             updateStrategy: "newest-build"
@@ -71,7 +71,7 @@ spec:
     # --- PRODUCTION ---
     - namePattern: "prod-my-app"
       images:
-        - alias: "app-prod"
+        - alias: "app"
           imageName: "lehardocker/ecommerce-app"
           commonUpdateSettings:
             updateStrategy: "newest-build"
