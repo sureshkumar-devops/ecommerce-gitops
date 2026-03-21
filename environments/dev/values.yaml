@@ -7,7 +7,7 @@ deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: Always
-  tag: "dev-4ef547f" # Image Updater will replace this with dev-<sha>
+  tag: "dev-42aff99" # Image Updater will replace this with dev-<sha>
 # --- Service Configuration ---    
 service:
   name: dev-svc-my-app
