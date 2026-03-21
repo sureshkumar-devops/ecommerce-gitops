@@ -33,19 +33,31 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@user.noreply.github.com"
 
-          git fetch --all --prune  
+          #git fetch --all --prune  
+          git fetch origin
+
           TARGETS=("staging" "master")
 
           for BRANCH in "${TARGETS[@]}" ; do
             echo  "🔄 Syncing $BRANCH with dev (excluding environments/)"
+
+            # Switch to the target branch and ensure it's fresh
             git checkout $BRANCH
             git reset --hard origin/$BRANCH
 
-            # Copy everything from dev except environments/
-            git checkout origin/dev -- .
-            git restore --staged environments/
-            git checkout $BRANCH -- environments/               
+            # 1. Start a merge from dev but DON'T commit yet
+            git merge origin/dev --no-commit --no-ff || true
 
+            # 2. Force the environments/ folder to stay exactly as it is on the TARGET branch
+            # This 'restores' the branch's original environment folder, preventing deletions.
+            git checkout HEAD -- environments/
+                     
+            # Copy everything from dev except environments/
+            #git checkout origin/dev -- .
+            #git restore --staged environments/
+            #git checkout $BRANCH -- environments/               
+
+            # 3. Finalize the sync            
             git add .
              if ! git diff --cached --quiet; then
               git commit -m "Sync from dev → $BRANCH (excluding environments/)"
