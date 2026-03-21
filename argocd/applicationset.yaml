@@ -28,8 +28,11 @@ spec:
      path: charts/my-app
      helm:
        releaseName: "{{env}}-my-app" 
-       valueFiles:
-       - environments/{{env}}/values.yaml
+       valueFiles:       
+       - "../../environments/{{env}}/values.yaml"
+       parameters:
+            - name: "env"
+              value: "{{env}}"
     destination:     
      server: https://kubernetes.default.svc
      namespace: '{{env}}'       
@@ -39,3 +42,5 @@ spec:
        prune: true
      syncOptions:
      - CreateNamespace=true
+     # Allows ArgoCD to recreate the Deployment if the selector labels changed
+     - Replace=true
