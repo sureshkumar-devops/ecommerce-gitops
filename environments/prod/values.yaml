@@ -9,7 +9,7 @@ deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: Always
-  tag: "dev-87abe23"
+  tag: "dev-42aff99"
 
 # --- Service Configuration ---
      
