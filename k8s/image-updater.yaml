@@ -7,28 +7,8 @@ metadata:
     app.kubernetes.io/managed-by: helm
     app.kubernetes.io/part-of: ecommerce
     environment: gitops
-spec:
-  # This namespace field tells the updater where to look for the Applications
+spec:  
   namespace: argocd
-  
-  #writeBackConfig:
-  #  method: "git:secret:argocd/git-creds"
-  #  gitConfig:
-  #    repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
-     # --- GLOBAL CONFIG (Used by all environments) ---
-  #config:
-   # git.commit.user: "argocd-image-updater"
-   # git.commit.email: "argocd-image-updater@user.noreply@argoproj.io"
-   # git.commit-message-template: |
-   #   chore(image): update {{ .AppName }} 
-
-      #{{ range .AppChanges -}}
-      #Environment: {{ $.AppName }}
-      #Image: {{ .Image.Name }}
-      #Previous Tag: {{ .OldTag }}
-      #New Tag: {{ .NewTag }}
-      #{{ end -}}
-
   applicationRefs:  
     #------------ DEVELOPMENT --------------------
     - namePattern: "dev-my-app"
