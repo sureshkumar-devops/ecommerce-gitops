@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: multi-env
-  namespace: argocd
+  namespace: argocd  
 spec:
  generators:
  - list:
@@ -10,15 +10,12 @@ spec:
     - env: dev
       namespace: dev
       branch: dev
-      values: environments/dev/values.yaml
     - env: staging
       namespace: staging
       branch: staging
-      values: environments/staging/values.yaml
-    - env: prod
+    - env: prod      
       namespace: prod
       branch: master
-      values: environments/prod/values.yaml
 
  template:
    metadata:
@@ -30,15 +27,15 @@ spec:
      targetRevision: '{{branch}}'
      path: charts/my-app
      helm:
-       releaseName: "{{env}}-my-app"
-       valueFiles:
-        - "{{ values }}"
+       releaseName: "{{env}}-my-app" 
+       valueFiles:       
+       - "../../environments/{{env}}/values.yaml"
        parameters:
             - name: "env"
               value: "{{env}}"
-    destination:
+    destination:     
      server: https://kubernetes.default.svc
-     namespace: '{{ namespace }}'
+     namespace: '{{env}}'       
     syncPolicy:
      automated:
        selfHeal: true

@@ -4,7 +4,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: {{ include "my-app.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ .Values.env }}
   labels:
     #{{- include "my-app.labels" . | nindent 4 }}
     app.kubernetes.io/name: {{ .Chart.Name }}
@@ -44,8 +44,10 @@ spec:
   strategy:
     blueGreen:
       # These services must exist in your service.yaml
-      activeService: {{ include "my-app.fullname" . }}-active
-      previewService: {{ include "my-app.fullname" . }}-preview
+      #activeService: {{ include "my-app.fullname" . }}-active
+      activeService: {{ .Values.env }}-svc-my-app-active  
+      #previewService: {{ include "my-app.fullname" . }}-preview
+      previewService: {{ .Values.env }}-svc-my-app-preview
       # Manual promotion: You must run 'kubectl argo rollouts promote' to switch traffic
       autoPromotionEnabled: false
 {{- end }}

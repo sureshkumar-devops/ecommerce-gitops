@@ -1,20 +1,51 @@
-deploymentStrategy: canary
-containerPort: 3000 # matches app inside container
-probePath: /  # <--- DO NOT use /health if your app doesn't have it!
+
+# --- Global Environment Identifier ---
+
+env: staging
+
+# --- Deployment / Rollout Settings ---
 
 replicaCount: 2
+deploymentStrategy: canary
 image:
   repository: lehardocker/ecommerce-app
-  tag: "dev-dcae671"
-  pullPolicy: Always
+  tag: "stag-32b66e9"
+  pullPolicy: Always  
 
+# --- Service Configuration ---
+  
 service:
-  port: 80          # external service port
-  targetPort: 3000  # matches app inside container
+  name: staging-svc-my-app
+  port: 80 # external service port
+  targetPort: 3000 # matches app inside container
 
-# Provide defaults for the probes
+
+# --- Container & Probe Settings ---
+
+containerPort: 3000 # matches app inside container
+  # Provide defaults for the probes
+
+probePath: / # <--- DO NOT use /health if your app doesn't have it!
 readinessProbe:
   initialDelaySeconds: 5
 livenessProbe:
   initialDelaySeconds: 15
+
+# --- Gateway API Configuration (The Missing Parts) ---
+
+gateway:
+  enabled: true
+  className: nginx  # Matches your GatewayClass name
+
+httpRoute:
+  enabled: true
+  parentGatewayName: staging-gateway
+  hostnames:
+    - staging.admedia.com
+
+# --- Cluster-wide Resources ---
+
+gatewayClass:
+  create: true  # Set to true in dev, false in staging/prod to avoid duplicates
+
 

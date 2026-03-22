@@ -3,10 +3,9 @@ apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: {{ include "my-app.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ .Values.env }}
   labels:
-    #{{- include "my-app.labels" . | nindent 4 }}
-    app.kubernetes.io/name: {{ .Chart.Name }}
+    {{- include "my-app.labels" . | nindent 4 }}    
 spec:
   replicas: {{ .Values.replicaCount }}
   # The strategy defines how the canary rollout progresses
@@ -19,9 +18,8 @@ spec:
         - pause: { duration: 30s }
         - setWeight: 100
   selector:
-    matchLabels:
-       app.kubernetes.io/name: {{ .Chart.Name }}    
-      #{{- include "my-app.selectorLabels" . | nindent 6 }}
+    matchLabels:         
+      {{- include "my-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:

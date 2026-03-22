@@ -6,7 +6,7 @@ metadata:
   name: {{ .Values.env }}-svc-gapi-my-app  
   namespace: {{ .Values.env }}  
   labels:
-    {{- include "chart.labels" . | nindent 4 }}
+    {{- include "my-app.labels" . | nindent 4 }}    
 spec:
   parentRefs:
     - name: {{ .Values.httpRoute.parentGatewayName }}

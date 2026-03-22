@@ -3,12 +3,13 @@ apiVersion: v1
 kind: Service
 metadata:
    # Matches 'previewService' in rollout-bluegreen.yaml
-  name: {{ .Release.Namespace }}-svc-{{ .Chart.Name }}-preview
+  name: {{ .Values.env }}-svc-{{ .Chart.Name }}-preview
+  namespace: {{ .Values.env }}  
   labels:
     {{- include "my-app.labels" . | nindent 4 }}
 spec:
   selector:
-    app: my-app
+    {{- include "my-app.selectorLabels" . | nindent 4 }}
   type: {{ .Values.service.type | default "ClusterIP" }}  
   ports:  
   - port: {{ .Values.service.port | default 80 }}
