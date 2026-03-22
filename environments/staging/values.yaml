@@ -1,10 +1,7 @@
 
 # --- Global Environment Identifier ---
-
 env: staging
-
 # --- Deployment / Rollout Settings ---
-
 replicaCount: 2
 deploymentStrategy: canary
 image:
@@ -12,8 +9,7 @@ image:
   tag: "stag-0453a51"
   pullPolicy: Always  
 
-# --- Service Configuration ---
-  
+# --- Service Configuration ---  
 service:
   name: staging-svc-my-app
   port: 80 # external service port
@@ -21,7 +17,6 @@ service:
 
 
 # --- Container & Probe Settings ---
-
 containerPort: 3000 # matches app inside container
   # Provide defaults for the probes
 
@@ -32,7 +27,6 @@ livenessProbe:
   initialDelaySeconds: 15
 
 # --- Gateway API Configuration (The Missing Parts) ---
-
 gateway:
   enabled: true
   className: nginx  # Matches your GatewayClass name
@@ -44,7 +38,6 @@ httpRoute:
     - staging.admedia.com
 
 # --- Cluster-wide Resources ---
-
 gatewayClass:
   create: false  # Set to true in dev, false in staging/prod to avoid duplicates
 
