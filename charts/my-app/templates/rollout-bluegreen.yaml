@@ -6,17 +6,20 @@ metadata:
   name: {{ include "my-app.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "my-app.labels" . | nindent 4 }}
+    #{{- include "my-app.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ .Chart.Name }}
 spec:
   replicas: {{ .Values.replicaCount | default 3 }}
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: my-app
+      #app: my-app
+      app.kubernetes.io/name: {{ .Chart.Name }}
   template:
     metadata:
       labels:
-        app: my-app
+        #app: my-app
+        app.kubernetes.io/name: {{ .Chart.Name }}
     spec:
       containers:
         - name: my-app-c3
