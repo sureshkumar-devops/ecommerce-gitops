@@ -5,7 +5,8 @@ metadata:
   name: {{ include "my-app.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "my-app.labels" . | nindent 4 }}
+    #{{- include "my-app.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ .Chart.Name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   # The strategy defines how the canary rollout progresses
@@ -19,7 +20,8 @@ spec:
         - setWeight: 100
   selector:
     matchLabels:
-      {{- include "my-app.selectorLabels" . | nindent 6 }}
+       app.kubernetes.io/name: {{ .Chart.Name }}    
+      #{{- include "my-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
