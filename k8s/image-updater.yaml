@@ -4,9 +4,9 @@ metadata:
   name: ecommerce-image-updater
   namespace: argocd
   labels:
-    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/managed-by: argocd 
     app.kubernetes.io/part-of: ecommerce
-    environment: gitops
+    environment: gitops-dev
 spec:  
   namespace: argocd
   applicationRefs:  
