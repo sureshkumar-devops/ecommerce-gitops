@@ -1,6 +1,7 @@
 
 # --- Global Environment Identifier ---
 env: staging
+gitopsBranch: staging
 # --- Deployment / Rollout Settings ---
 replicaCount: 2
 deploymentStrategy: canary
