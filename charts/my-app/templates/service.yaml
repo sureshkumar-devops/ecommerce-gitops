@@ -4,7 +4,11 @@ metadata:
   name:  {{ .Values.service.name }} 
   namespace: {{ .Values.env }}  
   labels:
-    {{- include "my-app.labels" . | nindent 4 }}
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    environment: {{ .Values.env }}
+    gitops.branch: {{ .Values.gitopsBranch }}
 spec:
   type: {{ .Values.service.type | default "ClusterIP" }} 
   ports:

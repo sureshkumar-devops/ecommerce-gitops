@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: multi-env
+  name: ecommerce-applicationset
   namespace: argocd  
 spec:
  generators:
@@ -20,6 +20,12 @@ spec:
  template:
    metadata:
     name: '{{env}}-my-app'
+    labels:
+      app.kubernetes.io/managed-by: argocd
+      app.kubernetes.io/part-of: ecommerce
+      environment: '{{env}}'
+      app.kubernetes.io/name: ecommerce-app
+      gitops.branch: '{{branch}}'  
    spec:
     project: default
     source:

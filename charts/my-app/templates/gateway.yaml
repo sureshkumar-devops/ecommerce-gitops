@@ -3,7 +3,13 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: {{ .Values.env }}-gateway
-  namespace: {{ .Values.env }}  
+  namespace: {{ .Values.env }} 
+  labels:
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
+    app.kubernetes.io/name: {{ .Values.env }}-gateway
+    environment: {{ .Values.env }}
+    gitops.branch: {{ .Values.gitopsBranch }}  
 spec:
   gatewayClassName: {{ .Values.gateway.className }}
   listeners:

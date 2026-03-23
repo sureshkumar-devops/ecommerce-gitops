@@ -4,9 +4,13 @@ kind: Service
 metadata:
    # Matches 'previewService' in rollout-bluegreen.yaml
   name: {{ .Values.env }}-svc-{{ .Chart.Name }}-preview
-  namespace: {{ .Values.env }}  
+  namespace: {{ .Values.env }} 
   labels:
-    {{- include "my-app.labels" . | nindent 4 }}
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    environment: {{ .Values.env }}
+    gitops.branch: {{ .Values.gitopsBranch }}  
 spec:
   selector:
     {{- include "my-app.selectorLabels" . | nindent 4 }}
