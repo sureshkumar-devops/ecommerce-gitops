@@ -36,11 +36,4 @@ spec:
     destination:     
      server: https://kubernetes.default.svc
      namespace: '{{env}}'       
-    syncPolicy:
-     automated:
-       selfHeal: false
-       prune: false
-     syncOptions:
-     - CreateNamespace=true
-     # Allows ArgoCD to recreate the Deployment if the selector labels changed
-     - Replace=false
+    syncPolicy: null
