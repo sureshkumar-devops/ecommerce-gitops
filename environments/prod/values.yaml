@@ -1,7 +1,7 @@
 # --- Global Environment Identifier ---
 
 env: prod
-
+gitopsBranch: master
 # --- Deployment / Rollout Settings ---
 
 replicaCount: 3
