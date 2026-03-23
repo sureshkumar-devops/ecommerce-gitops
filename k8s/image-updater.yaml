@@ -1,4 +1,4 @@
-apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+apiVersion: argocd-image-updater.argoproj.io/v2alpha1
 kind: ImageUpdater
 metadata:
   name: ecommerce-image-updater
@@ -28,6 +28,13 @@ spec:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
           branch: "dev"
           writeBackTarget: "environments/dev/values.yaml"          
+      metadata:
+        labels:
+          app.kubernetes.io/managed-by: argocd
+          app.kubernetes.io/part-of: ecommerce
+          environment: dev
+          app.kubernetes.io/name: ecommerce-app
+          gitops.branch: dev      
 
    # --- STAGING ---
     - namePattern: "staging-my-app"
@@ -47,6 +54,13 @@ spec:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
           branch: "staging"
           writeBackTarget: "environments/staging/values.yaml"
+      metadata:
+        labels:
+          app.kubernetes.io/managed-by: argocd
+          app.kubernetes.io/part-of: ecommerce
+          environment: staging
+          app.kubernetes.io/name: ecommerce-app
+          gitops.branch: staging      
 
     # --- PRODUCTION ---
     - namePattern: "prod-my-app"
@@ -66,4 +80,11 @@ spec:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
           branch: "master"
           writeBackTarget: "environments/prod/values.yaml"
-
+      metadata:
+        labels:
+          app.kubernetes.io/managed-by: argocd
+          app.kubernetes.io/part-of: ecommerce
+          environment: production
+          app.kubernetes.io/name: ecommerce-app
+          gitops.branch: master  
+      
