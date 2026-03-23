@@ -1,6 +1,7 @@
 # --- Global Environment Identifier ---
 
 env: dev
+gitopsBranch: dev
 # --- Deployment / Rollout Settings ---
 replicaCount: 1
 deploymentStrategy: deployment
