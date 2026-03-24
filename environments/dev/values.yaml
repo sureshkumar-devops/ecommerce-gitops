@@ -1,36 +1,59 @@
 # --- Global Environment Identifier ---
-
 env: dev
 gitopsBranch: dev
+
 # --- Deployment / Rollout Settings ---
 replicaCount: 1
 deploymentStrategy: deployment
+
 image:
   repository: lehardocker/ecommerce-app
-  pullPolicy: Always
-  tag: "dev-11f873b" # Image Updater will replace this with dev-<sha>
-# --- Service Configuration ---    
+  tag: "dev-11f873b"  # Image Updater will replace this with dev-<sha>
+  pullPolicy: Always  
+
+# --- Service Configuration ---  
 service:
   name: dev-svc-my-app
-  port: 80 # external service port
+  port: 80  # external service port
   targetPort: 3000 # matches app inside container
-# --- Container & Probe Settings ---
+
+# --- Container & Resource Settings ---
 containerPort: 3000 # matches app inside container
-probePath: /
-# Provide defaults for the probes
+
+# Fixed: Added empty resources block to prevent "null" error in template
+resources: 
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# --- Probe Settings ---
+# Provide defaults to prevent template rendering errors
+probePath: / 
 readinessProbe:
   initialDelaySeconds: 5
+  timeoutSeconds: 2
+  periodSeconds: 10
+  failureThreshold: 3
 livenessProbe:
   initialDelaySeconds: 15
-# --- Gateway API Configuration (The Missing Parts) ---
+  timeoutSeconds: 2
+  periodSeconds: 10
+  failureThreshold: 3
+
+# --- Gateway API Configuration ---
 gateway:
   enabled: true
   className: nginx # Matches your GatewayClass name
+
 httpRoute:
   enabled: true
   parentGatewayName: dev-gateway
   hostnames:
-  - dev.admedia.com
+    - dev.admedia.com
+
 # --- Cluster-wide Resources ---
 gatewayClass:
   create: true # Set to true in dev, false in staging/prod to avoid duplicates
