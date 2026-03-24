@@ -26,7 +26,7 @@ spec:
         method: "git:secret:argocd/git-creds"
         gitConfig:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
-          branch: "dev"
+          branch: "dev"  # <--- Ensure this points to dev for all environments
           writeBackTarget: "environments/dev/values.yaml"          
 
    # --- STAGING ---
@@ -45,7 +45,7 @@ spec:
         method: "git:secret:argocd/git-creds"
         gitConfig:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
-          branch: "staging"
+          branch: "dev" # <--- FIXED: Now updates dev branch, staging folder
           writeBackTarget: "environments/staging/values.yaml"
 
     - namePattern: "prod-my-app"
@@ -63,6 +63,6 @@ spec:
         method: "git:secret:argocd/git-creds"
         gitConfig:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
-          branch: "master"
+          branch: "dev" # <--- FIXED: Now updates dev branch, prod folder
           writeBackTarget: "environments/prod/values.yaml"
       

@@ -30,12 +30,12 @@ spec:
     project: default
     source:
      repoURL: https://github.com/sureshkumar-devops/ecommerce-gitops.git
-     targetRevision: '{{branch}}'
-     path: charts/my-app
+     targetRevision: dev  # <--- Point to your dev branch
+     path: charts/my-app  # <--- Use the shared templates
      helm:
        releaseName: "{{env}}-my-app" 
        valueFiles:       
-       - "../../environments/{{env}}/values.yaml"
+       - "../../environments/{{env}}/values.yaml" # <--- Use dev or staging or prod env values
        parameters:
        - name: "env"
          value: "{{env}}"
