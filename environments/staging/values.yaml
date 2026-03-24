@@ -1,10 +1,11 @@
-
 # --- Global Environment Identifier ---
 env: staging
 gitopsBranch: staging
+
 # --- Deployment / Rollout Settings ---
 replicaCount: 2
 deploymentStrategy: canary
+
 image:
   repository: lehardocker/ecommerce-app
   tag: "stag-11f873b"
@@ -13,24 +14,39 @@ image:
 # --- Service Configuration ---  
 service:
   name: staging-svc-my-app
-  port: 80 # external service port
-  targetPort: 3000 # matches app inside container
+  port: 80 
+  targetPort: 3000
 
+# --- Container & Resource Settings ---
+containerPort: 3000
 
-# --- Container & Probe Settings ---
-containerPort: 3000 # matches app inside container
-  # Provide defaults for the probes
+# Fixed: Added empty resources block to prevent "null" error in template
+resources: 
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
 
-probePath: / # <--- DO NOT use /health if your app doesn't have it!
+# --- Probe Settings ---
+# Provide defaults to prevent template rendering errors
+probePath: / 
 readinessProbe:
   initialDelaySeconds: 5
+  timeoutSeconds: 2
+  periodSeconds: 10
+  failureThreshold: 3
 livenessProbe:
   initialDelaySeconds: 15
+  timeoutSeconds: 2
+  periodSeconds: 10
+  failureThreshold: 3
 
-# --- Gateway API Configuration (The Missing Parts) ---
+# --- Gateway API Configuration ---
 gateway:
   enabled: true
-  className: nginx  # Matches your GatewayClass name
+  className: nginx
 
 httpRoute:
   enabled: true
@@ -40,6 +56,4 @@ httpRoute:
 
 # --- Cluster-wide Resources ---
 gatewayClass:
-  create: false  # Set to true in dev, false in staging/prod to avoid duplicates
-
-
+  create: false 
