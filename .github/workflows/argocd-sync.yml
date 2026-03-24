@@ -1,0 +1,41 @@
+name: ArgoCD Bulk Sync
+
+on:
+  push:
+    branches:
+      - dev  # Triggers on every push to the dev branch
+
+jobs:
+  sync-apps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install ArgoCD CLI
+        run: |
+          curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          chmod +x argocd
+          sudo mv argocd /usr/local/bin/argocd
+
+      - name: Login to ArgoCD
+        run: |
+          argocd login ${{ secrets.ARGOCD_SERVER }} \
+            --username ${{ secrets.ARGOCD_USERNAME }} \
+            --password ${{ secrets.ARGOCD_PASSWORD }} \
+            --insecure
+
+      - name: Refresh and Sync All Environments
+        run: |
+          ENVIRONMENTS=("dev" "staging" "prod")
+          for ENV in "${ENVIRONMENTS[@]}"
+          do
+            APP_NAME="${ENV}-my-app"
+            echo "Refreshing and Syncing: $APP_NAME"
+            # Hard refresh to clear manifest cache
+            argocd app get $APP_NAME --refresh --hard > /dev/null
+            # Sync with prune to remove old resources (like the moved GatewayClass)
+            argocd app sync $APP_NAME --prune
+            # Wait for health status
+            argocd app wait $APP_NAME --health --timeout 60
+          done
