@@ -1,0 +1,17 @@
+server:
+  image:
+    tag: v3.4.0-rc2   # upgrade Argo CD version
+
+  extraInitContainers:
+    - name: rollouts-extension
+      image: quay.io/argoprojlabs/argocd-extension-installer:v0.0.1
+      env:
+        - name: EXTENSION_URL
+          value: https://github.com/argoproj-labs/rollout-extension/releases/download/v0.3.5/extension.tar
+      volumeMounts:
+        - name: extensions
+          mountPath: /tmp/extensions
+
+  volumes:
+    - name: extensions
+      emptyDir: {}
