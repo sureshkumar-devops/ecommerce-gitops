@@ -1,39 +1,355 @@
-# --- Global Environment Identifier ---
+ {{- if eq .Values.deploymentStrategy "canary" }}
+  2 apiVersion: argoproj.io/v1alpha1
+  3 kind: Rollout
+  4 metadata:
+  5   name: {{ include "my-app.fullname" . }}
+  6   namespace: {{ .Values.env }}
+  7   labels:
+  8     app.kubernetes.io/managed-by: helm
+  9     app.kubernetes.io/part-of: ecommerce
+ 10     app.kubernetes.io/name: {{ .Chart.Name }}
+ 11     environment: {{ .Values.env }}
+ 13 spec:
+ 14   replicas: {{ .Values.replicaCount }}
+ 15   # The strategy defines how the canary rollout progresses
+ 16   strategy:
+ 17     canary:
+ 18       steps:
+ 19         - setWeight: 20
+ 20         - pause: { duration: 30s }
+ 21         - setWeight: 50
+ 22         - pause: { duration: 30s }
+ 23         - setWeight: 100
+ 24   selector:
+ 25     matchLabels:
+ 26       {{- include "my-app.selectorLabels" . | nindent 6 }}
+ 27   template:
+ 28     metadata:
+ 29       labels:
+ 30         {{- include "my-app.selectorLabels" . | nindent 8 }}
+ 31     spec:
+ 32       containers:
+ 33         - name: {{ .Chart.Name }}
+ 34           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+ 35           imagePullPolicy: {{ .Values.image.pullPolicy }}
+ 36           ports:
+ 37             - name: http-canary
+ 38               containerPort: {{ .Values.containerPort }}
+ 39               protocol: TCP
+ 40           # Use / as the path if /health doesn't exist in your code
+ 41           readinessProbe:
+ 42             httpGet:
+ 43               path: {{ .Values.probePath | default "/" }}
+ 44               port: {{ .Values.containerPort }}
+ 45             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default 10 }}
+ 46             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default 2 }}
+ 47             periodSeconds: {{ .Values.readinessProbe.periodSeconds | default 10 }}
+ 48             failureThreshold: {{ .Values.readinessProbe.failureThreshold | default 3 }}
+ 49           livenessProbe:
+ 50             httpGet:
+ 51               path: {{ .Values.probePath | default "/" }}
+ 52               port: {{ .Values.containerPort }}
+ 53             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default 20 }}
+ 54             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default 2 }}
+ 55             periodSeconds: {{ .Values.livenessProbe.periodSeconds | default 10 }}
+ 56             failureThreshold: {{ .Values.livenessProbe.failureThreshold | default 3 }}
+ 57           resources:
+ 58             {{- toYaml .Values.resources | nindent 12 }}
+ 59 {{- end }}
+                            
+ helm template . --values ../../environments/staging/values.yaml
+---
+# Source: my-app/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name:  staging-svc-my-app
+  namespace: staging
+  labels:
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
+    app.kubernetes.io/name: my-app
+    environment: staging
+    gitops.branch:
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: my-app
+    app.kubernetes.io/instance: release-name
+---
+# Source: my-app/templates/gateway.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: staging-gateway
+  namespace: staging
+  labels:
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
+    app.kubernetes.io/name: staging-gateway
+    environment: staging
+    gitops.branch:
+spec:
+  gatewayClassName: nginx
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+    hostname: "staging.admedia.com"
+    allowedRoutes:
+      namespaces:
+        from: Same
+---
+# Source: my-app/templates/httproute.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  # Generates: dev-svc-gapi-my-app, prod-svc-gapi-my-app, etc.
+  name: staging-httproute-my-app
+  namespace: staging
+  labels:
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
+    app.kubernetes.io/name: my-app
+    environment: staging
+    gitops.branch:
+spec:
+  parentRefs:
+    - name: staging-gateway
+      # Useful if the gateway is in a different namespace
+  hostnames:
+    - "staging.admedia.com"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: staging-svc-my-app
+          port: 80
+---
+# Source: my-app/templates/rollout.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: release-name-my-app
+  namespace: staging
+  labels:
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
+    app.kubernetes.io/name: my-app
+    environment: staging
+    gitops.branch:
+spec:
+  replicas: 2
+  # The strategy defines how the canary rollout progresses
+  strategy:
+    canary:
+      steps:
+        - setWeight: 20
+        - pause: { duration: 30s }
+        - setWeight: 50
+        - pause: { duration: 30s }
+        - setWeight: 100
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: my-app
+      app.kubernetes.io/instance: release-name
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: my-app
+        app.kubernetes.io/instance: release-name
+    spec:
+      containers:
+        - name: my-app
+          image: "lehardocker/ecommerce-app:stag-32b66e9"
+          imagePullPolicy: Always
+          ports:
+            - name: http-canary
+              containerPort: 3000
+              protocol: TCP
+          # Use / as the path if /health doesn't exist in your code
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            timeoutSeconds: 2
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 15
+            timeoutSeconds: 2
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            null
+--- ---
+# Source: my-app/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "release-name-my-app-test-connection"
+  labels:
+    helm.sh/chart: my-app-0.1.0
+    app.kubernetes.io/name: my-app
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+    environment: staging
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['release-name-my-app:80']
+  restartPolicy: Never
 
+CONDITION        MESSAGE  LAST TRANSITION
+ComparisonError  Failed to load target state: failed to generate manifest for source 1 of 1: rpc error: code = Unknown desc = Manifest generation error (cached): failed to execute helm template command: failed to get command args to log: `helm template . --name-template staging-my-app --namespace staging --kube-version 1.31.2 --set env=staging --values <path to cached source>/environments/staging/values.yaml <api versions removed> --include-crds` failed exit status 1: Error: YAML parse error on my-app/templates/rollout.yaml: error converting YAML to JSON: yaml: line 29: did not find expected key
+
+
+
+====
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: release-name-my-app
+  namespace: staging
+  labels:
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
+    app.kubernetes.io/name: my-app
+    environment: staging
+      #gitops.branch:
+spec:
+  replicas: 2
+  # The strategy defines how the canary rollout progresses
+  strategy:
+    canary:
+      steps:
+        - setWeight: 20
+        - pause: { duration: 30s }
+        - setWeight: 50
+        - pause: { duration: 30s }
+        - setWeight: 100
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: my-app
+      app.kubernetes.io/instance: release-name
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: my-app
+        app.kubernetes.io/instance: release-name
+    spec:
+      containers:
+        - name: my-app
+          image: "lehardocker/ecommerce-app:stag-32b66e9"
+          imagePullPolicy: Always
+          ports:
+
+==================
+Common labels (Standard Prefix)
+*/}}
+{{- define "my-app.labels" -}}
+helm.sh/chart: {{ include "my-app.chart" . }}
+{{ include "my-app.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- if .Values.env }}
+environment: {{ .Values.env }}
+{{- end }}
+{{- end }}
+
+{{/*
+Common labels (Alias for your HTTPRoute template)
+*/}}
+{{- define "chart.labels" -}}
+{{ include "my-app.labels" . }}
+{{- end }}
+
+{{/*
+Selector labels
+*/}}
+{{- define "my-app.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "my-app.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "my-app.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "my-app.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
+=============================
+# --- Global Environment Identifier ---
 env: prod
 gitopsBranch: master
-# --- Deployment / Rollout Settings ---
 
+# --- Deployment / Rollout Settings ---
 replicaCount: 3
 deploymentStrategy: bluegreen
+
 image:
   repository: lehardocker/ecommerce-app
-  pullPolicy: Always
-  tag: "v2026.03.21-0453a51"
+  tag: "v2026.03.21-11f873b"  # Image Updater will replace this with dev-<sha>
+  pullPolicy: Always  
 
-# --- Service Configuration ---
-     
+# --- Service Configuration ---  
 service:
   name: prod-svc-my-app
-  port: 80 # external service port
+  port: 80  # external service port
   targetPort: 3000 # matches app inside container
 
-# --- Container & Probe Settings ---
-    
+# --- Container & Resource Settings ---
 containerPort: 3000 # matches app inside container
-probePath: /
-# Provide defaults for the probes
+
+# Fixed: Added empty resources block to prevent "null" error in template
+resources: 
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# --- Probe Settings ---
+# Provide defaults to prevent template rendering errors
+probePath: / 
 readinessProbe:
   initialDelaySeconds: 5
+  timeoutSeconds: 2
+  periodSeconds: 10
+  failureThreshold: 3
 livenessProbe:
   initialDelaySeconds: 15
+  timeoutSeconds: 2
+  periodSeconds: 10
+  failureThreshold: 3
 
-
-# --- Gateway API Configuration (The Missing Parts) ---
-
+# --- Gateway API Configuration ---
 gateway:
   enabled: true
-  className: nginx  # Matches your GatewayClass name
+  className: nginx # Matches your GatewayClass name
 
 httpRoute:
   enabled: true
@@ -42,7 +358,5 @@ httpRoute:
     - prod.admedia.com
 
 # --- Cluster-wide Resources ---
-
 gatewayClass:
-  create: false  # Set to true in dev, false in staging/prod to avoid duplicates
-    
+  create: false # Set to true in dev, false in staging/prod to avoid duplicates
