@@ -14,9 +14,13 @@ jobs:
 
       - name: Install ArgoCD CLI
         run: |
-          curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-          chmod +x argocd
-          sudo mv argocd /usr/local/bin/argocd
+          # Download to a temporary location first
+          curl -sSL -o /tmp/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          chmod +x /tmp/argocd
+          # Use sudo only if your runner user supports it, otherwise move to a local bin
+          sudo mv /tmp/argocd /usr/local/bin/argocd || mkdir -p $HOME/.local/bin && mv /tmp/argocd $HOME/.local/bin/argocd
+          # Add to path just in case
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Login to ArgoCD
         run: |
