@@ -1,9 +1,20 @@
 name: ArgoCD Bulk Sync
 
 on:
-  push:
-    branches:
-      - dev  # Triggers on every push to the dev branch
+  #push:
+  workflow_dispatch: 
+    inputs:
+      source:
+        description: "Source environment (dev)"
+        required: true
+        default: dev
+      target:
+        description: "Target environment (staging or prod)"
+        required: true
+        type: choice
+        options:
+          - staging
+          - prod
 
 jobs:
   sync-apps:
