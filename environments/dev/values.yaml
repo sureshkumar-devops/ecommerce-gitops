@@ -54,6 +54,4 @@ httpRoute:
   hostnames:
     - dev.admedia.com
 
-# --- Cluster-wide Resources ---
-gatewayClass:
-  create: true # Set to true in dev, false in staging/prod to avoid duplicates
+

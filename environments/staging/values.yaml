@@ -54,6 +54,4 @@ httpRoute:
   hostnames:
     - staging.admedia.com
 
-# --- Cluster-wide Resources ---
-gatewayClass:
-  create: false 
+
