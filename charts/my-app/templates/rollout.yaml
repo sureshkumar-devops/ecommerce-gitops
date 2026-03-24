@@ -3,13 +3,14 @@ apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: {{ include "my-app.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ .Values.env }}
   labels:
-    #{{- include "my-app.labels" . | nindent 4 }}
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
     app.kubernetes.io/name: {{ .Chart.Name }}
-spec:
+    environment: {{ .Values.env }}
+spec: # Fixed: This is now correctly aligned with metadata
   replicas: {{ .Values.replicaCount }}
-  # The strategy defines how the canary rollout progresses
   strategy:
     canary:
       steps:
@@ -20,12 +21,11 @@ spec:
         - setWeight: 100
   selector:
     matchLabels:
-       app.kubernetes.io/name: {{ .Chart.Name }}    
-      #{{- include "my-app.selectorLabels" . | nindent 6 }}
+      {{- include "my-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "my-app.selectorLabels" . | nindent 8 }}        
+        {{- include "my-app.selectorLabels" . | nindent 8 }}
     spec:
       containers:
         - name: {{ .Chart.Name }}
@@ -35,7 +35,6 @@ spec:
             - name: http-canary
               containerPort: {{ .Values.containerPort }}
               protocol: TCP
-          # Use / as the path if /health doesn't exist in your code
           readinessProbe:
             httpGet:
               path: {{ .Values.probePath | default "/" }}
