@@ -1,37 +1,31 @@
 # --- Global Environment Identifier ---
 env: staging
 gitopsBranch: staging
-
 # --- Deployment / Rollout Settings ---
 replicaCount: 2
 deploymentStrategy: canary
-
 image:
   repository: lehardocker/ecommerce-app
-  tag: "stag-11f873b"
-  pullPolicy: Always  
-
+  tag: "stag-88efd4a"
+  pullPolicy: Always
 # --- Service Configuration ---  
 service:
   name: staging-svc-my-app
-  port: 80 
+  port: 80
   targetPort: 3000
-
 # --- Container & Resource Settings ---
 containerPort: 3000
-
 # Fixed: Added empty resources block to prevent "null" error in template
-resources: 
+resources:
   limits:
     cpu: 200m
     memory: 256Mi
   requests:
     cpu: 100m
     memory: 128Mi
-
 # --- Probe Settings ---
 # Provide defaults to prevent template rendering errors
-probePath: / 
+probePath: /
 readinessProbe:
   initialDelaySeconds: 5
   timeoutSeconds: 2
@@ -42,16 +36,12 @@ livenessProbe:
   timeoutSeconds: 2
   periodSeconds: 10
   failureThreshold: 3
-
 # --- Gateway API Configuration ---
 gateway:
   enabled: true
   className: nginx
-
 httpRoute:
   enabled: true
   parentGatewayName: staging-gateway
   hostnames:
-    - staging.admedia.com
-
-
+  - staging.admedia.com
