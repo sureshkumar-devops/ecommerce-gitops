@@ -19,4 +19,4 @@ spec:
       name: http
   selector:
     {{- include "my-app.selectorLabels" . | nindent 4 }}
-{{-end }}
+{{- end }}
