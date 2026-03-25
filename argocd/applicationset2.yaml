@@ -1,0 +1,51 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: multi-env
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - env: dev
+            namespace: dev
+            branch: dev
+            valueFiles:
+              - environments/dev/values.yaml
+          - env: staging
+            namespace: staging
+            branch: staging
+            valueFiles:
+              - environments/staging/values.yaml
+          - env: prod
+            namespace: prod
+            branch: master
+            valueFiles:
+              - environments/prod/values.yaml
+  template:
+    metadata:
+      name: '{{env}}-my-app'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/sureshkumar-devops/ecommerce-gitops.git
+        targetRevision: '{{branch}}'
+        path: charts/my-app
+        helm:
+          releaseName: '{{env}}-my-app'
+          valueFiles:
+            - '{{valueFiles}}'
+          parameters:
+            - name: env
+              value: '{{env}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true
+        syncOptions:
+          - CreateNamespace=true
+          - Replace=true
+

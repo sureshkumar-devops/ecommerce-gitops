@@ -1,20 +1,57 @@
-deploymentStrategy: canary
-containerPort: 3000 # matches app inside container
-probePath: /  # <--- DO NOT use /health if your app doesn't have it!
+# --- Global Environment Identifier ---
+env: staging
+gitopsBranch: staging
 
+# --- Deployment / Rollout Settings ---
 replicaCount: 2
+deploymentStrategy: canary
+
 image:
   repository: lehardocker/ecommerce-app
-  tag: "dev-dcae671"
-  pullPolicy: Always
+  tag: "stag-11f873b"
+  pullPolicy: Always  
 
+# --- Service Configuration ---  
 service:
-  port: 80          # external service port
-  targetPort: 3000  # matches app inside container
+  name: staging-svc-my-app
+  port: 80 
+  targetPort: 3000
 
-# Provide defaults for the probes
+# --- Container & Resource Settings ---
+containerPort: 3000
+
+# Fixed: Added empty resources block to prevent "null" error in template
+resources: 
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# --- Probe Settings ---
+# Provide defaults to prevent template rendering errors
+probePath: / 
 readinessProbe:
   initialDelaySeconds: 5
+  timeoutSeconds: 2
+  periodSeconds: 10
+  failureThreshold: 3
 livenessProbe:
   initialDelaySeconds: 15
+  timeoutSeconds: 2
+  periodSeconds: 10
+  failureThreshold: 3
+
+# --- Gateway API Configuration ---
+gateway:
+  enabled: true
+  className: nginx
+
+httpRoute:
+  enabled: true
+  parentGatewayName: staging-gateway
+  hostnames:
+    - staging.admedia.com
+
 

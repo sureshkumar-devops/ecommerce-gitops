@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+data:
+  # This registers the Rollout tab
+  extension.config: |
+    extensions:
+      - name: rollout
+        url: https://raw.githubusercontent.com/argoproj/argo-rollouts/master/ui-extension/extensions.json 
+    

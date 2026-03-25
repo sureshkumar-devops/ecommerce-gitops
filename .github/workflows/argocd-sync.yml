@@ -1,0 +1,48 @@
+name: ArgoCD Bulk Sync
+
+on:
+  #push:
+  workflow_dispatch: 
+    inputs:
+      source:
+        description: "Source environment (dev)"
+        required: true
+        default: dev
+      target:
+        description: "Target environment (staging or prod)"
+        required: true
+        type: choice
+        options:
+          - staging
+          - prod
+
+jobs:
+  sync-apps:
+    runs-on: self-hosted 
+    
+    steps:
+    
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to ArgoCD
+        run: |
+          argocd login ${{ secrets.ARGOCD_SERVER }} \
+            --username ${{ secrets.ARGOCD_USERNAME }} \
+            --password ${{ secrets.ARGOCD_PASSWORD }} \
+            --insecure
+            
+      - name: Refresh and Sync All Environments
+        run: |
+          ENVIRONMENTS=("dev" "staging" "prod")
+          for ENV in "${ENVIRONMENTS[@]}"
+          do
+            APP_NAME="${ENV}-my-app"
+            echo "Refreshing and Syncing: $APP_NAME"
+            # Hard refresh to clear manifest cache
+            argocd app get $APP_NAME --refresh --hard > /dev/null
+            # Sync with prune to remove old resources (like the moved GatewayClass)
+            argocd app sync $APP_NAME --prune
+            # Wait for health status
+            argocd app wait $APP_NAME --health --timeout 60
+          done

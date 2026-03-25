@@ -1,0 +1,157 @@
+---
+# Source: my-app/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name:  staging-svc-my-app 
+  namespace: staging  
+  labels:
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
+    app.kubernetes.io/name: my-app
+    environment: staging
+    gitops.branch: 
+spec:
+  type: ClusterIP 
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: my-app
+    app.kubernetes.io/instance: release-name
+---
+# Source: my-app/templates/gateway.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: staging-gateway
+  namespace: staging 
+  labels:
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
+    app.kubernetes.io/name: staging-gateway
+    environment: staging
+    gitops.branch:   
+spec:
+  gatewayClassName: nginx
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+    hostname: "staging.admedia.com"
+    allowedRoutes:
+      namespaces:
+        from: Same
+---
+# Source: my-app/templates/httproute.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  # Generates: dev-svc-gapi-my-app, prod-svc-gapi-my-app, etc.
+  name: staging-httproute-my-app  
+  namespace: staging  
+  labels:
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
+    app.kubernetes.io/name: my-app
+    environment: staging
+    gitops.branch: 
+spec:
+  parentRefs:
+    - name: staging-gateway
+      # Useful if the gateway is in a different namespace
+  hostnames:
+    - "staging.admedia.com"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: staging-svc-my-app
+          port: 80
+---
+# Source: my-app/templates/rollout.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: release-name-my-app
+  namespace: staging
+  labels:
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
+    app.kubernetes.io/name: my-app
+    environment: staging
+      #gitops.branch: 
+spec:
+  replicas: 2
+  # The strategy defines how the canary rollout progresses
+  strategy:
+    canary:
+      steps:
+        - setWeight: 20
+        - pause: { duration: 30s }
+        - setWeight: 50
+        - pause: { duration: 30s }
+        - setWeight: 100
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: my-app
+      app.kubernetes.io/instance: release-name
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: my-app
+        app.kubernetes.io/instance: release-name        
+    spec:
+      containers:
+        - name: my-app
+          image: "lehardocker/ecommerce-app:stag-32b66e9"
+          imagePullPolicy: Always
+          ports:
+            - name: http-canary
+              containerPort: 3000
+              protocol: TCP
+          # Use / as the path if /health doesn't exist in your code
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            timeoutSeconds: 2
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 15
+            timeoutSeconds: 2
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            null
+---
+# Source: my-app/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "release-name-my-app-test-connection"
+  labels:
+    helm.sh/chart: my-app-0.1.0
+    app.kubernetes.io/name: my-app
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+    environment: staging
+  annotations:
+    "helm.sh/hook": test123
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['release-name-my-app:80']
+  restartPolicy: Never

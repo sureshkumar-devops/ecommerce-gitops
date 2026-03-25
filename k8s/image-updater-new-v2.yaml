@@ -26,8 +26,15 @@ spec:
         method: "git:secret:argocd/git-creds"
         gitConfig:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
-          branch: "dev"  # <--- Ensure this points to dev for all environments
+          branch: "dev"
           writeBackTarget: "environments/dev/values.yaml"          
+      metadata:
+        labels:
+          app.kubernetes.io/managed-by: argocd
+          app.kubernetes.io/part-of: ecommerce
+          environment: dev
+          app.kubernetes.io/name: ecommerce-app
+          gitops.branch: dev      
 
    # --- STAGING ---
     - namePattern: "staging-my-app"
@@ -45,9 +52,17 @@ spec:
         method: "git:secret:argocd/git-creds"
         gitConfig:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
-          branch: "dev" # <--- FIXED: Now updates dev branch, staging folder
+          branch: "staging"
           writeBackTarget: "environments/staging/values.yaml"
+      metadata:
+        labels:
+          app.kubernetes.io/managed-by: argocd
+          app.kubernetes.io/part-of: ecommerce
+          environment: staging
+          app.kubernetes.io/name: ecommerce-app
+          gitops.branch: staging      
 
+    # --- PRODUCTION ---
     - namePattern: "prod-my-app"
       images:
         - alias: "app"
@@ -63,6 +78,13 @@ spec:
         method: "git:secret:argocd/git-creds"
         gitConfig:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
-          branch: "dev" # <--- FIXED: Now updates dev branch, prod folder
+          branch: "master"
           writeBackTarget: "environments/prod/values.yaml"
+      metadata:
+        labels:
+          app.kubernetes.io/managed-by: argocd
+          app.kubernetes.io/part-of: ecommerce
+          environment: production
+          app.kubernetes.io/name: ecommerce-app
+          gitops.branch: master  
       

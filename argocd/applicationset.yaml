@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: multi-env
+  name: ecommerce-applicationset
   namespace: argocd  
 spec:
  generators:
@@ -20,27 +20,34 @@ spec:
  template:
    metadata:
     name: '{{env}}-my-app'
+    labels:
+      app.kubernetes.io/managed-by: argocd
+      app.kubernetes.io/part-of: ecommerce
+      environment: '{{env}}'
+      app.kubernetes.io/name: ecommerce-app
+      gitops.branch: '{{branch}}'  
    spec:
     project: default
     source:
      repoURL: https://github.com/sureshkumar-devops/ecommerce-gitops.git
-     targetRevision: '{{branch}}'
-     path: charts/my-app
+     targetRevision: dev  # <--- Point to your dev branch
+     path: charts/my-app  # <--- Use the shared templates
      helm:
        releaseName: "{{env}}-my-app" 
        valueFiles:       
-       - "../../environments/{{env}}/values.yaml"
+       - "../../environments/{{env}}/values.yaml" # <--- Use dev or staging or prod env values
        parameters:
-            - name: "env"
-              value: "{{env}}"
+       - name: "env"
+         value: "{{env}}"
     destination:     
      server: https://kubernetes.default.svc
      namespace: '{{env}}'       
-    syncPolicy:
+    syncPolicy: 
      automated:
        selfHeal: true
        prune: true
      syncOptions:
-     - CreateNamespace=true
-     # Allows ArgoCD to recreate the Deployment if the selector labels changed
-     - Replace=true
+     -  CreateNamespace=true
+
+
+
