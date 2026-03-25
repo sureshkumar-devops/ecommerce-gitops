@@ -1,12 +1,25 @@
+# --- Global Environment Identifier ---
+
+env: prod
+
+# --- Deployment / Rollout Settings ---
+
 replicaCount: 3
 deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
   pullPolicy: Always
-  tag: "dev-dcae671" # Image Updater will replace this with dev-<sha>
+  tag: "v2026.03.21-0453a51"
+
+# --- Service Configuration ---
+     
 service:
+  name: prod-svc-my-app
   port: 80 # external service port
   targetPort: 3000 # matches app inside container
+
+# --- Container & Probe Settings ---
+    
 containerPort: 3000 # matches app inside container
 probePath: /
 # Provide defaults for the probes
@@ -14,3 +27,18 @@ readinessProbe:
   initialDelaySeconds: 5
 livenessProbe:
   initialDelaySeconds: 15
+
+
+# --- Gateway API Configuration (The Missing Parts) ---
+
+gateway:
+  enabled: true
+  className: nginx  # Matches your GatewayClass name
+
+httpRoute:
+  enabled: true
+  parentGatewayName: prod-gateway
+  hostnames:
+    - prod.admedia.com
+
+  

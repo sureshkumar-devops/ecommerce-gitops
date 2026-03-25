@@ -3,12 +3,17 @@ apiVersion: v1
 kind: Service
 metadata:
  # Matches 'activeService' in rollout-bluegreen.yaml
-  name: {{ .Release.Namespace }}-svc-{{ .Chart.Name }}-active
+  name: {{ .Values.env }}-svc-{{ .Chart.Name }}-active
+  namespace: {{ .Values.env }}  
   labels:
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
     app.kubernetes.io/name: {{ .Chart.Name }}
+    environment: {{ .Values.env }}
+    gitops.branch: {{ .Values.gitopsBranch }}
 spec:
   selector:  
-    app.kubernetes.io/name: {{ .Chart.Name }}  
+    {{- include "my-app.selectorLabels" . | nindent 4 }}  
   type: {{ .Values.service.type | default "ClusterIP" }}
   ports:
     - port: {{ .Values.service.port | default 80 }}

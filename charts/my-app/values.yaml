@@ -43,7 +43,7 @@ serviceAccount:
 # --- Gateway API Configuration ---
 
 gatewayClass:
-  create: false  # Set to false if the class 'nginx' already exists in the cluster
+  create: true  # Set to false if the class 'nginx' already exists in the cluster
 
 gateway:
   enabled: true
