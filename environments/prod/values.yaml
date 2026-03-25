@@ -1,44 +1,48 @@
 # --- Global Environment Identifier ---
-
 env: prod
-
+gitopsBranch: master
 # --- Deployment / Rollout Settings ---
-
 replicaCount: 3
 deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
-  pullPolicy: Always
   tag: "v2026.03.21-0453a51"
-
+  pullPolicy: Always
 # --- Service Configuration ---
-     
 service:
   name: prod-svc-my-app
   port: 80 # external service port
   targetPort: 3000 # matches app inside container
-
-# --- Container & Probe Settings ---
-    
+# --- Container & Probe Settings ---   
 containerPort: 3000 # matches app inside container
+# Fixed: Added empty resources block to prevent "null" error in template
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+# --- Probe Settings ---
+# Provide defaults to prevent template rendering errors
 probePath: /
-# Provide defaults for the probes
 readinessProbe:
   initialDelaySeconds: 5
+  timeoutSeconds: 2
+  periodSeconds: 10
+  failureThreshold: 3
 livenessProbe:
   initialDelaySeconds: 15
-
-
-# --- Gateway API Configuration (The Missing Parts) ---
-
+  timeoutSeconds: 2
+  periodSeconds: 10
+  failureThreshold: 3
+# --- Gateway API Configuration ---
 gateway:
   enabled: true
-  className: nginx  # Matches your GatewayClass name
-
+  className: nginx  
 httpRoute:
   enabled: true
   parentGatewayName: prod-gateway
   hostnames:
     - prod.admedia.com
-
   
