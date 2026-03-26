@@ -6,7 +6,7 @@ replicaCount: 3
 deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
-  tag: "v2026.03.25-88efd4a"       
+  tag: "v2026.03.26-b0cf167"       
   pullPolicy: Always
 # --- Service Configuration ---
 service:
