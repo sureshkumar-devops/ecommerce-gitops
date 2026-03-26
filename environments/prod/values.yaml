@@ -6,12 +6,13 @@ replicaCount: 3
 deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
-  tag: "v2026.03.26-5b2ceef"
+  tag: "v2026.03.26-87e6873"
   pullPolicy: Always
 # --- Service Configuration ---
 service:
-  name: prod-svc-my-app
-  port: 80 # external service port
+  name: prod-svc-my-app-active
+  previewName: prod-svc-my-app-preview # Add this line
+  port: 80
   targetPort: 3000 # matches app inside container
 # --- Container & Probe Settings ---   
 containerPort: 3000 # matches app inside container
@@ -36,12 +37,10 @@ livenessProbe:
   timeoutSeconds: 2
   periodSeconds: 10
   failureThreshold: 3
-# --- Gateway API Configuration ---
-gateway:
-  enabled: true
-  className: nginx
 httpRoute:
   enabled: true
-  parentGatewayName: prod-gateway
+  parentGatewayName: shared-gateway
+  parentGatewayNamespace: nginx-gateway
+  parentGatewaySectionName: http-prod
   hostnames:
   - prod.admedia.com
