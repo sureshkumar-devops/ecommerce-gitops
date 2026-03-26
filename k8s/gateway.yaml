@@ -1,13 +1,32 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: dev-gateway
-  namespace: dev
+  name: shared-gateway
+  namespace: nginx-gateway 
+  labels:
+    app.kubernetes.io/part-of: ecommerce
 spec:
   gatewayClassName: nginx
-  listeners:  
-  - name: http
+  listeners:
+  - name: http-dev
     protocol: HTTP
     port: 80
-    hostname: dev.admedia.com
+    hostname: "dev.admedia.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+  - name: http-prod
+    protocol: HTTP
+    port: 80
+    hostname: "prod.admedia.com"
+    allowedRoutes:
+      namespaces:
+        from: All
+  - name: http-staging
+    protocol: HTTP
+    port: 80
+    hostname: "staging.admedia.com"
+    allowedRoutes:
+      namespaces:
+        from: All
 

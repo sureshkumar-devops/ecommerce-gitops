@@ -1,17 +1,38 @@
-{{- if eq .Values.deploymentStrategy "deployment" }}
+# 1. THE MAIN / ACTIVE SERVICE
+# Always created for every environment (Dev, Staging, Prod)
 apiVersion: v1
 kind: Service
 metadata:
-  name:  {{ .Values.service.name }} 
-  namespace: {{ .Values.env }}  
+  name: {{ .Values.service.name }}  # Matches 'stableService' or 'activeService'
+  namespace: {{ .Values.env }}
   labels:
-    app.kubernetes.io/managed-by: helm
-    app.kubernetes.io/part-of: ecommerce
     app.kubernetes.io/name: {{ .Chart.Name }}
     environment: {{ .Values.env }}
-    gitops.branch: {{ .Values.gitopsBranch }}
 spec:
-  type: {{ .Values.service.type | default "ClusterIP" }} 
+  type: {{ .Values.service.type | default "ClusterIP" }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "my-app.selectorLabels" . | nindent 4 }}
+
+---
+
+# 2. THE PREVIEW / CANARY SERVICE
+# Only created if we are NOT doing a simple "deployment"
+{{- if ne .Values.deploymentStrategy "deployment" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.previewName }} # Matches 'canaryService' or 'previewService'
+  namespace: {{ .Values.env }}
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    environment: {{ .Values.env }}
+spec:
+  type: {{ .Values.service.type | default "ClusterIP" }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
@@ -20,3 +41,4 @@ spec:
   selector:
     {{- include "my-app.selectorLabels" . | nindent 4 }}
 {{- end }}
+
