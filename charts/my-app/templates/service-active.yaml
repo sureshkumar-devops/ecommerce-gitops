@@ -12,8 +12,9 @@ metadata:
     environment: {{ .Values.env }}
     gitops.branch: {{ .Values.gitopsBranch }}
 spec:
-  selector:  
-    {{- include "my-app.selectorLabels" . | nindent 4 }}  
+  selector:     
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
   type: {{ .Values.service.type | default "ClusterIP" }}
   ports:
     - port: {{ .Values.service.port | default 80 }}
