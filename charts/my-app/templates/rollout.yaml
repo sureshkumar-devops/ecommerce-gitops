@@ -1,29 +1,15 @@
-{{- if eq .Values.deploymentStrategy "canary" }}
+{{- if ne .Values.deploymentStrategy "deployment" }}
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: {{ include "my-app.fullname" . }}
   namespace: {{ .Values.env }}
   labels:
-    app.kubernetes.io/managed-by: helm
-    app.kubernetes.io/part-of: ecommerce
     app.kubernetes.io/name: {{ .Chart.Name }}
     environment: {{ .Values.env }}
-spec: # Fixed: This is now correctly aligned with metadata
-  replicas: {{ .Values.replicaCount }}
-  strategy:
-    canary:
-      canaryService: {{ .Values.service.previewName }} # The "new" version
-      stableService: {{ .Values.service.name }}        # The "old" version
-      trafficRouting:
-        gatewayAPI:
-         httpRoute: {{ .Values.env }}-httproute-my-app
-      steps:
-        - setWeight: 20
-        - pause: { duration: 30s }
-        - setWeight: 50
-        - pause: { duration: 30s }
-        - setWeight: 100
+spec:
+  replicas: {{ .Values.replicaCount | default 2 }}
+  revisionHistoryLimit: 3
   selector:
     matchLabels:
       {{- include "my-app.selectorLabels" . | nindent 6 }}
@@ -35,27 +21,43 @@ spec: # Fixed: This is now correctly aligned with metadata
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
           ports:
-            - name: http-canary
-              containerPort: {{ .Values.containerPort }}
-              protocol: TCP
+            - name: http
+              containerPort: {{ .Values.containerPort | default 3000 }}
           readinessProbe:
             httpGet:
               path: {{ .Values.probePath | default "/" }}
-              port: {{ .Values.containerPort }}
-            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default 10 }}
-            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default 2 }}
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds | default 10 }}
-            failureThreshold: {{ .Values.readinessProbe.failureThreshold | default 3 }}
+              port: {{ .Values.containerPort | default 3000 }}
+            initialDelaySeconds: 10
           livenessProbe:
             httpGet:
               path: {{ .Values.probePath | default "/" }}
-              port: {{ .Values.containerPort }}
-            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default 20 }}
-            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default 2 }}
-            periodSeconds: {{ .Values.livenessProbe.periodSeconds | default 10 }}
-            failureThreshold: {{ .Values.livenessProbe.failureThreshold | default 3 }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+              port: {{ .Values.containerPort | default 3000 }}
+            initialDelaySeconds: 20
+
+  strategy:
+    {{- if eq .Values.deploymentStrategy "canary" }}
+    # --- CANARY STRATEGY (Used in Staging) ---
+    canary:
+      canaryService: {{ .Values.service.previewName }}
+      stableService: {{ .Values.service.name }}
+      trafficRouting:
+        gatewayAPI:
+          httpRoute: {{ .Values.env }}-httproute-my-app
+      steps:
+        - setWeight: 20
+        - pause: { duration: 30s }
+        - setWeight: 50
+        - pause: { duration: 30s }
+    {{- end }}
+
+    {{- if eq .Values.deploymentStrategy "bluegreen" }}
+    # --- BLUE-GREEN STRATEGY (Used in Prod) ---
+    blueGreen:
+      activeService: {{ .Values.service.name }}
+      previewService: {{ .Values.service.previewName }}
+      autoPromotionEnabled: false # Manual promotion required for Prod
+    {{- end }}
 {{- end }}
+
