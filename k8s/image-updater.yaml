@@ -47,14 +47,15 @@ spec:
           repository: "https://github.com/sureshkumar-devops/ecommerce-gitops.git"
           branch: "dev" # <--- FIXED: Now updates dev branch, staging folder
           writeBackTarget: "environments/staging/values.yaml"
-
+          
+  # --- PRODUCTION ---
     - namePattern: "prod-my-app"
       images:
         - alias: "app"
           imageName: "lehardocker/ecommerce-app"
           commonUpdateSettings:
             updateStrategy: "newest-build"
-            allowTags: "regexp:^v[0-9]+\\.[0-9]+\\.[0-9]-.*"            
+            allowTags: "regexp:^v[0-9]{4}+\\.[0-9]{2}+\\.[0-9]{2}-.*"            
           manifestTargets:
             helm:
               name: "image.repository"
