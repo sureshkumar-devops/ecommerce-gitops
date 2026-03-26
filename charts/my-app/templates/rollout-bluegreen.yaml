@@ -20,9 +20,9 @@ spec:
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
-      labels:        
+      labels:
         app.kubernetes.io/name: {{ .Chart.Name }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/instance: {{ .Release.Name }}  # ADD THIS LINE
     spec:
       containers:
         - name: my-app-c3
@@ -53,4 +53,4 @@ spec:
       previewService: {{ .Values.env }}-svc-my-app-preview
       # Manual promotion: You must run 'kubectl argo rollouts promote' to switch traffic
       autoPromotionEnabled: false
-{{- end }}
+        {{- end }}
