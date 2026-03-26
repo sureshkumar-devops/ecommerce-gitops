@@ -13,6 +13,11 @@ spec: # Fixed: This is now correctly aligned with metadata
   replicas: {{ .Values.replicaCount }}
   strategy:
     canary:
+      canaryService: {{ .Values.service.previewName }} # The "new" version
+      stableService: {{ .Values.service.name }}        # The "old" version
+      trafficRouting:
+        gatewayAPI:
+         httpRoute: {{ .Values.env }}-httproute-my-app
       steps:
         - setWeight: 20
         - pause: { duration: 30s }
@@ -54,4 +59,3 @@ spec: # Fixed: This is now correctly aligned with metadata
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
 {{- end }}
-
