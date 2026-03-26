@@ -36,12 +36,11 @@ livenessProbe:
   timeoutSeconds: 2
   periodSeconds: 10
   failureThreshold: 3
-# --- Gateway API Configuration ---
-gateway:
-  enabled: true
-  className: nginx
+
 httpRoute:
   enabled: true
-  parentGatewayName: staging-gateway
+  parentGatewayName: shared-gateway
+  parentGatewayNamespace: nginx-gateway
+  parentGatewaySectionName: http-staging  
   hostnames:
   - staging.admedia.com

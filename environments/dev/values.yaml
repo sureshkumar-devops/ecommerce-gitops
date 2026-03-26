@@ -36,12 +36,10 @@ livenessProbe:
   timeoutSeconds: 2
   periodSeconds: 10
   failureThreshold: 3
-# --- Gateway API Configuration ---
-gateway:
-  enabled: true
-  className: nginx # Matches your GatewayClass name
 httpRoute:
   enabled: true
-  parentGatewayName: dev-gateway
+  parentGatewayName: shared-gateway
+  parentGatewayNamespace: nginx-gateway
+  parentGatewaySectionName: http-dev  
   hostnames:
   - dev.admedia.com
