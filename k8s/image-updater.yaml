@@ -9,20 +9,6 @@ metadata:
     environment: gitops-dev
 spec:  
   namespace: argocd
-  # --- GLOBAL CONFIG (Used by all environments) ---
-  config:
-    git.commit.user: "argocd-image-updater"
-    git.commit.email: "argocd-image-updater@user.noreply@argoproj.io"
-    git.commit-message-template: |
-      chore(image): update {{ .AppName }} 
-
-      {{ range .AppChanges -}}
-      Environment: {{ $.AppName }}
-      Image: {{ .Image.Name }}
-      Previous Tag: {{ .OldTag }}
-      New Tag: {{ .NewTag }}
-      {{ end -}}
-
   applicationRefs:  
     #------------ DEVELOPMENT --------------------
     - namePattern: "dev-my-app"
