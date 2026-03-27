@@ -9,7 +9,7 @@ spec:
   - name: metricName
     value: error-rate
   metrics:
-  - name: {{ .Values.analysis.metricName | default "error-rate" }}
+  - name: {{`{{args.metricName}}`}}
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
     successCondition: result < {{ .Values.analysis.successThreshold }}
