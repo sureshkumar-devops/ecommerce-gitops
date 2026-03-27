@@ -16,7 +16,7 @@ data:
         prefix: docker.io
         api_url: https://registry-1.docker.io
         # Updated to match the secret we created earlier
-        credentials: secret:argocd/dockerhub-creds
+        credentials: pullsecret:argocd/dockerhub-creds
         defaultns: library
         default: true
 
