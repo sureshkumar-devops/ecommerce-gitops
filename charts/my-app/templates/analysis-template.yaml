@@ -9,10 +9,10 @@ spec:
   - name: metricName
     value: error-rate
   metrics:
-  - name: {{ "{{ args.metricName }}" }}
+  - name: {{ .Values.analysis.metricName | default "error-rate" }}
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: result < {{ .Values.analysis.sucessThreshold }}
+    successCondition: result < {{ .Values.analysis.successThreshold }}
     failureCondition: result >= {{ .Values.analysis.failureThreshold }}
     provider:
       prometheus:
