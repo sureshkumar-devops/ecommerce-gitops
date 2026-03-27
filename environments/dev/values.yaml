@@ -6,7 +6,7 @@ replicaCount: 1
 deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
-  tag: "dev-d3832ba" # Image Updater will replace this with dev-<sha>
+  tag: "dev-87e6873" # Image Updater will replace this with dev-<sha>
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
@@ -40,6 +40,6 @@ httpRoute:
   enabled: true
   parentGatewayName: shared-gateway
   parentGatewayNamespace: nginx-gateway
-  parentGatewaySectionName: http-dev  
+  parentGatewaySectionName: http-dev
   hostnames:
   - dev.admedia.com

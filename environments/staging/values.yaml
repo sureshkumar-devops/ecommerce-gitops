@@ -1,18 +1,21 @@
 # --- Global Environment Identifier ---
+
 env: staging
 gitopsBranch: staging
 
 
 # --- Deployment / Rollout Settings ---
+
 replicaCount: 2
 deploymentStrategy: canary
 image:
   repository: lehardocker/ecommerce-app
-  tag: "stag-d3832ba"
+  tag: "stag-87e6873"
   pullPolicy: Always
 
 
 # --- Service Configuration ---  
+
 service:
   name: staging-svc-my-app-active # stable service
   previewName: staging-svc-my-app-preview # canary/new service  
@@ -21,8 +24,10 @@ service:
 
 
 # --- Container & Resource Settings ---
+
 containerPort: 3000
 # Fixed: Added empty resources block to prevent "null" error in template
+
 resources:
   limits:
     cpu: 200m
@@ -31,8 +36,10 @@ resources:
     cpu: 100m
     memory: 128Mi
 
+
 # --- Probe Settings ---
 # Provide defaults to prevent template rendering errors
+
 probePath: /
 readinessProbe:
   initialDelaySeconds: 5
@@ -45,12 +52,25 @@ livenessProbe:
   periodSeconds: 10
   failureThreshold: 3
 
-# --- Gateway API Configuration --
 
+# --- Analysis Metrics Application Level ---
+
+analysis: 
+  enabled: true
+  interval: 30s
+  count: 3
+  successThreshold: 0.05
+  failureThreshold: 0.05
+  prometheus:
+    address: http://prometheus.monitoring.svc.cluster.local:9090
+    job: my-app
+
+
+# --- Gateway API Configuration --
 httpRoute:
   enabled: true
   parentGatewayName: shared-gateway
   parentGatewayNamespace: nginx-gateway
-  parentGatewaySectionName: http-staging  
+  parentGatewaySectionName: http-staging
   hostnames:
   - staging.admedia.com
