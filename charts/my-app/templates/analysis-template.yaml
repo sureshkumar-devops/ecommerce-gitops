@@ -1,0 +1,35 @@
+{{- if .Values.analysis.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ .Values.env }}-error-rate-check
+  namespace: {{ .Values.env }}
+spec:
+  args:
+  - name: metricName
+    value: error-rate
+  metrics:
+  - name: "{{ args.metricName }}"
+    interval: {{ .Values.analysis.interval }}
+    count: {{ .Values.analysis.count }}
+    successCondition: result < {{ .Values.analysis.sucessThreshold }}
+    failureCondition: result >= {{ .Values.analysis.failureThreshold }}
+    provider:
+      prometheus:
+        address: {{ .Values.analysis.prometheus.address }} 
+        query: |
+          {{- if eq .Values.env "staging" }}
+          # --- APP-LEVEL METRIC ---
+          sum(rate(http_requests_total{job="{{ .Values.analysis.prometheus.job }}",status=~"5.."}[1m]))/sum(rate(http_requests_total{job="{{ .Values.prometheus.job }}"}[1m]))
+          {{- else if eq .Values.env "prod" }}
+          # --- NGF-LEVEL METRIC ---
+          sum(rate(nginx_ingress_controller_requests{ingress="{{ .Values.analysis.prometheus.ingress }}",status=~"5.."}[1m]))/sum(rate(nginx_ingress_controller_requests{ingress="{{ .Values.analysis.prometheus.ingress }}"}[1m]))
+          {{- end }}
+{{- end }}
+
+
+              
+
+
+
+

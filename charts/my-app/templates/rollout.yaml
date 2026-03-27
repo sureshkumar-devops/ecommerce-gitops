@@ -47,6 +47,11 @@ spec:
           httpRoute: {{ .Values.env }}-httproute-my-app
       steps:
         - setWeight: 20
+        {{- if .Values.analysis.enabled }}  
+        - analysis:
+            templates:
+            - templateName: {{ .Values.env }}-error-rate-check
+        {{- end }}
         - pause: { duration: 30s }
         - setWeight: 50
         - pause: { duration: 30s }
@@ -58,6 +63,20 @@ spec:
       activeService: {{ .Values.service.name }}
       previewService: {{ .Values.service.previewName }}
       autoPromotionEnabled: false # Manual promotion required for Prod
+      {{- if .Values.analysis.enabled }}
+      prePromotionAnalysis:
+        templates:
+        - templateName: {{ .Values.env }}-error-rate-check
+          args:
+          - name: metricName
+            value: error-rate-pre
+      postPromotionAnalysis:
+        templates:
+        - templateName: {{ .Values.env }}-error-rate-check
+          args:
+          - name: metricName
+            value: error-rate-post
+      {{- end }} 
     {{- end }}
 {{- end }}
 
