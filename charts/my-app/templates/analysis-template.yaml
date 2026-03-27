@@ -7,29 +7,23 @@ metadata:
 spec:
   args:
   - name: metricName
-    value: error-rate
+  - name: jobName  # <--- Add this argument
   metrics:
-  - name: {{`{{args.metricName}}`}}
+  - name: {{ printf "{{args.metricName}}" | quote }}
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: result < {{ .Values.analysis.successThreshold }}
-    failureCondition: result >= {{ .Values.analysis.failureThreshold }}
+    successCondition: {{ printf "result < %v" .Values.analysis.successThreshold | quote }}
+    failureCondition: {{ printf "result >= %v" .Values.analysis.failureThreshold | quote }}
     provider:
       prometheus:
-        address: {{ .Values.analysis.prometheus.address }} 
+        address: {{ .Values.analysis.prometheus.address }}
         query: |
           {{- if eq .Values.env "staging" }}
-          # --- APP-LEVEL METRIC ---
-          sum(rate(http_requests_total{job="{{ .Values.analysis.prometheus.job }}",status=~"5.."}[1m]))/sum(rate(http_requests_total{job="{{ .Values.prometheus.job }}"}[1m]))
+          sum(rate(http_requests_total{job="{{`{{args.jobName}}` }}",status=~"5.."}[1m]))
+          / sum(rate(http_requests_total{job="{{`{{args.jobName}}` }}"}[1m]))
           {{- else if eq .Values.env "prod" }}
-          # --- NGF-LEVEL METRIC ---
-          sum(rate(nginx_ingress_controller_requests{ingress="{{ .Values.analysis.prometheus.ingress }}",status=~"5.."}[1m]))/sum(rate(nginx_ingress_controller_requests{ingress="{{ .Values.analysis.prometheus.ingress }}"}[1m]))
+          sum(rate(nginx_ingress_controller_requests{ingress="{{ .Values.analysis.prometheus.ingress }}",status=~"5.."}[1m]))
+          / sum(rate(nginx_ingress_controller_requests{ingress="{{ .Values.analysis.prometheus.ingress }}"}[1m]))
           {{- end }}
 {{- end }}
-
-
-              
-
-
-
 

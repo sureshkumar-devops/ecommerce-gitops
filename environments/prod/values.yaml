@@ -58,6 +58,7 @@ analysis:
   prometheus:
     address: http://prometheus.monitoring.svc.cluster.local:9090
     job: my-app
+    ingress: my-app-ingress
 
 
 # --- Gateway API Configuration --

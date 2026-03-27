@@ -1,0 +1,229 @@
+---
+# Source: my-app/templates/temp_analysis-template1.yaml
+
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: prod-error-rate-check
+  namespace: prod
+spec:
+  args:
+  - name: metricName
+    value: error-rate
+  metrics:
+  - name: {{args.metricName}}
+    interval: 30s
+    count: 3
+    successCondition: result < 0.05
+    failureCondition: result >= 0.05
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          # --- NGF-LEVEL METRIC ---
+          sum(rate(nginx_ingress_controller_requests{ingress="my-app-ingress",status=~"5.."}[1m]))
+          / sum(rate(nginx_ingress_controller_requests{ingress="my-app-ingress"}[1m]))
+
+---
+# Source: my-app/templates/rollout.yaml
+
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: prod-my-app
+  namespace: prod
+  labels:
+    app.kubernetes.io/name: my-app
+    environment: prod
+spec:
+  replicas: 3
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: my-app
+      app.kubernetes.io/instance: prod-my-app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: my-app
+        app.kubernetes.io/instance: prod-my-app
+    spec:
+      containers:
+        - name: my-app
+          image: "lehardocker/ecommerce-app:v2026.03.26-87e6873"
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 3000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 20
+
+  strategy:
+    # --- BLUE-GREEN STRATEGY (Used in Prod) ---
+    blueGreen:
+      activeService: prod-svc-my-app-active
+      previewService: prod-svc-my-app-preview
+      autoPromotionEnabled: false # Manual promotion required for Prod
+      prePromotionAnalysis:
+        templates:
+        - templateName: prod-error-rate-check
+          args:
+          - name: metricName
+            value: error-rate-pre
+      postPromotionAnalysis:
+        templates:
+        - templateName: prod-error-rate-check
+          args:
+          - name: metricName
+            value: error-rate-post
+
+
+---
+# Source: my-app/templates/httproute.yaml
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  # Generates: dev-svc-gapi-my-app, prod-svc-gapi-my-app, etc.
+  name: prod-httproute-my-app
+  namespace: prod
+  labels:
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/part-of: ecommerce
+    app.kubernetes.io/name: my-app
+    environment: prod
+    gitops.branch: master
+spec:
+  parentRefs:
+    - name: shared-gateway
+      # Useful if the gateway is in a different namespace
+      namespace: nginx-gateway
+      sectionName: http-prod
+  hostnames:
+    - "prod.admedia.com"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        # Main Active Service
+        - name: prod-svc-my-app-active
+          port: 80
+          weight: 100
+        # Only add the preview backend if previewName exists in values.yaml    
+        # Preview Service (Ready for Rollouts/testing)
+        - name: prod-svc-my-app-preview
+          port: 80 
+          weight: 0
+
+---
+# Source: my-app/templates/temp_analysis-template.yaml
+
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: prod-error-rate-check
+  namespace: prod
+spec:
+  args:
+  - name: metricName
+    value: error-rate
+  metrics:
+  - name: {{args.metricName}}
+    interval: 30s
+    count: 3
+    successCondition: result < 0.05
+    failureCondition: result >= 0.05
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090 
+        query: |
+          # --- NGF-LEVEL METRIC ---
+          sum(rate(nginx_ingress_controller_requests{ingress="my-app-ingress",status=~"5.."}[1m]))/sum(rate(nginx_ingress_controller_requests{ingress="my-app-ingress"}[1m]))
+
+
+              
+
+
+
+
+
+---
+# Source: my-app/templates/service.yaml
+# 1. THE MAIN / ACTIVE SERVICE
+# Always created for every environment (Dev, Staging, Prod)
+apiVersion: v1
+kind: Service
+metadata:
+  name: prod-svc-my-app-active  # Matches 'stableService' or 'activeService'
+  namespace: prod
+  labels:
+    app.kubernetes.io/name: my-app
+    environment: prod
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: my-app
+    app.kubernetes.io/instance: prod-my-app
+
+---
+
+# 2. THE PREVIEW / CANARY SERVICE
+# Only created if we are NOT doing a simple "deployment"
+apiVersion: v1
+kind: Service
+metadata:
+  name: prod-svc-my-app-preview # Matches 'canaryService' or 'previewService'
+  namespace: prod
+  labels:
+    app.kubernetes.io/name: my-app
+    environment: prod
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: my-app
+    app.kubernetes.io/instance: prod-my-app
+
+
+---
+# Source: my-app/templates/analysis-template.yaml
+
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: prod-error-rate-check
+  namespace: prod
+spec:
+  args:
+  - name: metricName
+  metrics:
+  - name: "{{args.metricName}}"
+    interval: 30s
+    count: 3
+    successCondition: "result < 0.05"
+    failureCondition: "result >= 0.05"
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          sum(rate(nginx_ingress_controller_requests{ingress="my-app-ingress",status=~"5.."}[1m]))
+          / sum(rate(nginx_ingress_controller_requests{ingress="my-app-ingress"}[1m]))
