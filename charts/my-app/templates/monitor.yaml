@@ -2,14 +2,14 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "my-app.fullname" . }}-servicemonitor
+  name: {{ .Values.monitoring.env }}-{{ include "my-app.fullname" . }}-servicemonitor
   namespace: {{ .Release.Namespace }}
   labels:
     release: {{ .Values.monitoring.prometheusRelease }}
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "my-app.fullname" . }}
+      app.kubernetes.io/name: {{ include "my-app.name" . }}
   namespaceSelector:
     matchNames:
     - {{ .Release.Namespace }}
@@ -21,14 +21,14 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: {{ include "my-app.fullname" . }}-podmonitor
+  name: {{ .Values.monitoring.env }}-{{ include "my-app.fullname" . }}-podmonitor
   namespace: {{ .Release.Namespace }}
   labels:
     release: {{ .Values.monitoring.prometheusRelease }}
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "my-app.fullname" . }}
+      app.kubernetes.io/name: {{ include "my-app.name" . }}
   namespaceSelector:
     matchNames:
     - {{ .Release.Namespace }}
