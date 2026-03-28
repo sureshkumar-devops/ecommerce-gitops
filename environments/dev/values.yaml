@@ -1,27 +1,20 @@
 # --- Global Environment Identifier ---
 env: dev
 gitopsBranch: dev
-
-
 # --- Deployment / Rollout Settings ---
 replicaCount: 1
 deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
-  tag: "dev-87e6873" # Image Updater will replace this with dev-<sha>
+  tag: "dev-31d0c08" # Image Updater will replace this with dev-<sha>
   pullPolicy: Always
-
-
 # --- Service Configuration ---  
 service:
   name: dev-svc-my-app
   port: 80 # external service port
   targetPort: 3000 # matches app inside container
-
-
 # --- Container & Resource Settings ---
 containerPort: 3000 # matches app inside container
-
 # Fixed: Added empty resources block to prevent "null" error in template
 resources:
   limits:
@@ -30,8 +23,6 @@ resources:
   requests:
     cpu: 100m
     memory: 128Mi
-
-
 # --- Probe Settings ---
 # Provide defaults to prevent template rendering errors
 probePath: /
@@ -45,19 +36,16 @@ livenessProbe:
   timeoutSeconds: 2
   periodSeconds: 10
   failureThreshold: 3
-
-analysis: 
+analysis:
   enabled: true
   interval: 30s
-  count: 2             # Reduced from 3 to 2 for faster Dev cycles
+  count: 2 # Reduced from 3 to 2 for faster Dev cycles
   successThreshold: 0.1 # Slightly more relaxed (10%) for unstable dev traffic
   failureThreshold: 0.1 # Slightly more relaxed
   prometheus:
     # Double check this internal URL exists in your Dev cluster!
-    address: http://prometheus-dev.monitoring.svc.cluster.local:9090 
-    job: my-app-dev    # Usually dev jobs have a -dev suffix
-
-
+    address: http://prometheus-dev.monitoring.svc.cluster.local:9090
+    job: my-app-dev # Usually dev jobs have a -dev suffix
 httpRoute:
   enabled: true
   parentGatewayName: shared-gateway
