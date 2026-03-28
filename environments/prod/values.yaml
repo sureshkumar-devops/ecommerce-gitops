@@ -47,7 +47,7 @@ analysis:
   successThreshold: 0.05
   failureThreshold: 0.05
   prometheus:
-    address: http://prometheus.monitoring.svc.cluster.local:9090
+    address: http://prometheus-operated.monitoring.svc.cluster.local:9090
     ingress: my-app-prod-ingress
 # --- Gateway API Configuration --
 httpRoute:
