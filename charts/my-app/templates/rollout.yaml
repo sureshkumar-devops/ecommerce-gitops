@@ -82,8 +82,7 @@ spec:
           - name: metricName
             value: error-rate-post
           - name: jobName
-            value: {{ include "my-app.jobName" . | quote }}    
+            value: {{ include "my-app.jobName" . | quote }}
       {{- end }}
     {{- end }}
 {{- end }}
-

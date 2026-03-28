@@ -1,4 +1,3 @@
-{{- if .Values.analysis.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisTemplate
 metadata:
@@ -9,22 +8,21 @@ spec:
   - name: metricName
   - name: jobName
   metrics:
-  - name: {{ printf "{{args.metricName}}" | quote }}
+  - name: "{{args.metricName}}"
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: {{ printf "result < %v" .Values.analysis.successThreshold | quote }}
-    failureCondition: {{ printf "result >= %v" .Values.analysis.failureThreshold | quote }}
+    successCondition: "result < {{ .Values.analysis.successThreshold }}"
+    failureCondition: "result >= {{ .Values.analysis.failureThreshold }}"
     provider:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
         query: |
           {{- if eq .Values.env "staging" }}
           # Staging: filter by job label
-          sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}",status=~"5.."}[1m]))
-          / sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m]))
+          sum(rate(http_requests_total{job="{{args.jobName}}",status=~"5.."}[1m]))
+          / sum(rate(http_requests_total{job="{{args.jobName}}"}[1m]))
           {{- else if eq .Values.env "prod" }}
           # Prod: filter by ingress label
-          sum(rate(nginx_ingress_controller_requests{ingress="{{`{{args.jobName}}`}}",status=~"5.."}[1m]))
-          / sum(rate(nginx_ingress_controller_requests{ingress="{{`{{args.jobName}}`}}"}[1m]))
+          sum(rate(nginx_ingress_controller_requests{ingress="{{args.jobName}}",status=~"5.."}[1m]))
+          / sum(rate(nginx_ingress_controller_requests{ingress="{{args.jobName}}"}[1m]))
           {{- end }}
-{{- end }}
