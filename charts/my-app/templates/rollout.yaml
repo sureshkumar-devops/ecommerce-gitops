@@ -70,19 +70,19 @@ spec:
       prePromotionAnalysis:
         templates:
         - templateName: {{ .Values.env }}-error-rate-check
-          args:
-          - name: metricName
-            value: error-rate-pre
-          - name: jobName
-            value: {{ include "my-app.jobName" . | quote }}
+        args:
+        - name: metricName
+          value: error-rate-pre
+        - name: jobName
+          value: {{ include "my-app.jobName" . | quote }}
       postPromotionAnalysis:
         templates:
         - templateName: {{ .Values.env }}-error-rate-check
-          args:
-          - name: metricName
-            value: error-rate-post
-          - name: jobName
-            value: {{ include "my-app.jobName" . | quote }}
+        args:
+        - name: metricName
+          value: error-rate-post
+        - name: jobName
+          value: {{ include "my-app.jobName" . | quote }}
       {{- end }}
     {{- end }}
 {{- end }}
