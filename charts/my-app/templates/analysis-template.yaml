@@ -23,6 +23,6 @@ spec:
           / sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m]))
           {{- else if eq .Values.env "prod" }}
           # Prod: filter by ingress label
-          sum(rate(nginx_ingress_controller_requests{ingress="{{`{{args.jobName}}`}}",status=~"5.."}[1m]))
-          / sum(rate(nginx_ingress_controller_requests{ingress="{{`{{args.jobName}}`}}"}[1m]))
+          sum(rate(nginx_http_requests_total{host="{{`{{args.jobName}}`}}",status=~"5.."}[1m]))
+          / sum(rate(nginx_http_requests_total{host="{{`{{args.jobName}}`}}"}[1m]))
           {{- end }}
