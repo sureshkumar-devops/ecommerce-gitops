@@ -44,7 +44,7 @@ analysis:
   failureThreshold: 0.1 # Slightly more relaxed
   prometheus:
     # Double check this internal URL exists in your Dev cluster!
-    address: http://prometheus-dev.monitoring.svc.cluster.local:9090
+    address: http://prometheus-operated.monitoring.svc.cluster.local:9090
     job: my-app-dev # Usually dev jobs have a -dev suffix
 httpRoute:
   enabled: true
