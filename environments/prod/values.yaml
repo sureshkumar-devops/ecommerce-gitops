@@ -2,30 +2,22 @@
 
 env: prod
 gitopsBranch: master
-
 # --- Deployment / Rollout Settings ---
-
 replicaCount: 3
 deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
   tag: "v2026.03.27-31d0c08"
   pullPolicy: Always
-
 # --- Service Configuration ---
-
 service:
   name: prod-svc-my-app-active
   previewName: prod-svc-my-app-preview # Add this line
   port: 80
   targetPort: 3000 # matches app inside container
-
 # --- Container & Probe Settings ---   
-
 containerPort: 3000 # matches app inside container
-
 # Fixed: Added empty resources block to prevent "null" error in template
-
 resources:
   limits:
     cpu: 200m
@@ -33,11 +25,9 @@ resources:
   requests:
     cpu: 100m
     memory: 128Mi
-
 # --- Probe Settings ---
 
 # Provide defaults to prevent template rendering errors
-
 probePath: /
 readinessProbe:
   initialDelaySeconds: 5
@@ -49,9 +39,7 @@ livenessProbe:
   timeoutSeconds: 2
   periodSeconds: 10
   failureThreshold: 3
-
 # --- Analysis Metrics NGF (Nginx Gateway Fabrics) Level ---
-
 analysis:
   enabled: true
   interval: 30s
@@ -61,10 +49,7 @@ analysis:
   prometheus:
     address: http://prometheus.monitoring.svc.cluster.local:9090
     ingress: my-app-prod-ingress
-
-
 # --- Gateway API Configuration --
-
 httpRoute:
   enabled: true
   parentGatewayName: shared-gateway
