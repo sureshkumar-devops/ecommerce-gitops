@@ -2,29 +2,20 @@
 
 env: staging
 gitopsBranch: staging
-
-
 # --- Deployment / Rollout Settings ---
-
 replicaCount: 2
 deploymentStrategy: canary
 image:
   repository: lehardocker/ecommerce-app
-  tag: "stag-87e6873"
+  tag: "stag-31d0c08"
   pullPolicy: Always
-
-
 # --- Service Configuration ---  
-
 service:
   name: staging-svc-my-app-active # stable service
   previewName: staging-svc-my-app-preview # canary/new service  
   port: 80
   targetPort: 3000
-
-
 # --- Container & Resource Settings ---
-
 containerPort: 3000
 # Fixed: Added empty resources block to prevent "null" error in template
 
@@ -35,11 +26,8 @@ resources:
   requests:
     cpu: 100m
     memory: 128Mi
-
-
 # --- Probe Settings ---
 # Provide defaults to prevent template rendering errors
-
 probePath: /
 readinessProbe:
   initialDelaySeconds: 5
@@ -51,11 +39,8 @@ livenessProbe:
   timeoutSeconds: 2
   periodSeconds: 10
   failureThreshold: 3
-
-
 # --- Analysis Metrics Application Level ---
-
-analysis: 
+analysis:
   enabled: true
   interval: 30s
   count: 3
@@ -64,8 +49,6 @@ analysis:
   prometheus:
     address: http://prometheus.monitoring.svc.cluster.local:9090
     job: my-app
-
-
 # --- Gateway API Configuration --
 httpRoute:
   enabled: true
