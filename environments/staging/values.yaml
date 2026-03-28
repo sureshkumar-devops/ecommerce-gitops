@@ -57,3 +57,12 @@ httpRoute:
   parentGatewaySectionName: http-staging
   hostnames:
   - staging.admedia.com
+
+# --- PodMonitor in staging to learn direct pod scraping. ---
+monitoring:
+  enabled: true
+  type: podmonitor
+  prometheusRelease: prometheus
+  portName: metrics
+  interval: 30s
+  path: /metrics

@@ -57,3 +57,14 @@ httpRoute:
   parentGatewaySectionName: http-prod
   hostnames:
   - prod.admedia.com
+
+# --- ServiceMonitor in prod for stable, service‑based scraping ---
+
+monitoring:
+  enabled: true
+  type: servicemonitor
+  prometheusRelease: prometheus
+  portName: metrics
+  interval: 30s
+  path: /metrics
+
