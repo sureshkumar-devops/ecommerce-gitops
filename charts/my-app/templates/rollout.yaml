@@ -50,11 +50,11 @@ spec:
         - analysis:
             templates:
             - templateName: {{ .Values.env }}-error-rate-check
-              args:
-              - name: metricName
-                value: error-rate-canary
-              - name: jobName
-                value: {{ include "my-app.jobName" . | quote }}
+            args:
+            - name: metricName
+              value: error-rate-canary
+            - name: jobName
+              value: {{ include "my-app.jobName" . | quote }}
         {{- end }}
         - pause: { duration: 30s }
         - setWeight: 50
