@@ -68,3 +68,15 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create the name jobName in AnalysisTemplate for metrics
+*/}}
+
+{{- define "my-app.jobName" -}}
+{{- if eq .Values.env "prod" -}}
+{{ .Values.analysis.prometheus.ingress }}
+{{- else -}}
+{{ include "my-app.fullname" . }}
+{{- end -}}
+{{- end -}}

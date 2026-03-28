@@ -7,7 +7,7 @@ metadata:
 spec:
   args:
   - name: metricName
-  - name: jobName  # <--- Add this argument
+  - name: jobName
   metrics:
   - name: {{ printf "{{args.metricName}}" | quote }}
     interval: {{ .Values.analysis.interval }}
@@ -19,11 +19,12 @@ spec:
         address: {{ .Values.analysis.prometheus.address }}
         query: |
           {{- if eq .Values.env "staging" }}
-          sum(rate(http_requests_total{job="{{`{{args.jobName}}` }}",status=~"5.."}[1m]))
-          / sum(rate(http_requests_total{job="{{`{{args.jobName}}` }}"}[1m]))
+          # Staging: filter by job label
+          sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}",status=~"5.."}[1m]))
+          / sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m]))
           {{- else if eq .Values.env "prod" }}
-          sum(rate(nginx_ingress_controller_requests{ingress="{{ .Values.analysis.prometheus.ingress }}",status=~"5.."}[1m]))
-          / sum(rate(nginx_ingress_controller_requests{ingress="{{ .Values.analysis.prometheus.ingress }}"}[1m]))
+          # Prod: filter by ingress label
+          sum(rate(nginx_ingress_controller_requests{ingress="{{`{{args.jobName}}`}}",status=~"5.."}[1m]))
+          / sum(rate(nginx_ingress_controller_requests{ingress="{{`{{args.jobName}}`}}"}[1m]))
           {{- end }}
 {{- end }}
-

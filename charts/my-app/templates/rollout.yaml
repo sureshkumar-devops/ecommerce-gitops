@@ -38,7 +38,6 @@ spec:
 
   strategy:
     {{- if eq .Values.deploymentStrategy "canary" }}
-    # --- CANARY STRATEGY (Used in Staging) ---
     canary:
       canaryService: {{ .Values.service.previewName }}
       stableService: {{ .Values.service.name }}
@@ -47,15 +46,15 @@ spec:
           httpRoute: {{ .Values.env }}-httproute-my-app
       steps:
         - setWeight: 20
-        {{- if .Values.analysis.enabled }}  
+        {{- if .Values.analysis.enabled }}
         - analysis:
             templates:
             - templateName: {{ .Values.env }}-error-rate-check
               args:
               - name: metricName
                 value: error-rate-canary
-              - name: jobName  # <--- Pass the dynamic name here
-                value: {{ include "my-app.fullname" . }} 
+              - name: jobName
+                value: {{ include "my-app.jobName" . | quote }}
         {{- end }}
         - pause: { duration: 30s }
         - setWeight: 50
@@ -63,11 +62,10 @@ spec:
     {{- end }}
 
     {{- if eq .Values.deploymentStrategy "bluegreen" }}
-    # --- BLUE-GREEN STRATEGY (Used in Prod) ---
     blueGreen:
       activeService: {{ .Values.service.name }}
       previewService: {{ .Values.service.previewName }}
-      autoPromotionEnabled: false # Manual promotion required for Prod
+      autoPromotionEnabled: false
       {{- if .Values.analysis.enabled }}
       prePromotionAnalysis:
         templates:
@@ -75,13 +73,17 @@ spec:
           args:
           - name: metricName
             value: error-rate-pre
+          - name: jobName
+            value: {{ include "my-app.jobName" . | quote }}
       postPromotionAnalysis:
         templates:
         - templateName: {{ .Values.env }}-error-rate-check
           args:
           - name: metricName
             value: error-rate-post
-      {{- end }} 
+          - name: jobName
+            value: {{ include "my-app.jobName" . | quote }}    
+      {{- end }}
     {{- end }}
 {{- end }}
 
