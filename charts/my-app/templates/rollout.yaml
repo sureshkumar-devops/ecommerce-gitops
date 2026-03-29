@@ -43,8 +43,7 @@ spec:
       stableService: {{ .Values.service.name }}
       trafficRouting:
         plugins:
-        - name: argoproj-labs/gateway-api
-          config:
+          argoproj-labs/gateway-api:
             httpRoute: {{ .Values.env }}-httproute-my-app
       steps:
         - setWeight: 20
