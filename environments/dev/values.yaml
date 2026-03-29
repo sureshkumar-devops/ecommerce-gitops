@@ -54,6 +54,10 @@ httpRoute:
   hostnames:
   - dev.admedia.com
 
+features:
+  RetryAnalysis: true
+  ExperimentTrafficRouting: true
+
 # --- ServiceMonitor in prod for stable, service‑based scraping ---
 
 monitoring:

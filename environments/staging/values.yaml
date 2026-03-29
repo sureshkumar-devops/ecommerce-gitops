@@ -58,6 +58,10 @@ httpRoute:
   hostnames:
   - staging.admedia.com
 
+features:
+  RetryAnalysis: true
+  ExperimentTrafficRouting: true
+
 # --- PodMonitor in staging to learn direct pod scraping. ---
 monitoring:
   enabled: true
