@@ -6,7 +6,7 @@ replicaCount: 1
 deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
-  tag: "dev-31d0c08" # Image Updater will replace this with dev-<sha>
+  tag: "dev-a305d6a" # Image Updater will replace this with dev-<sha>
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
@@ -53,13 +53,10 @@ httpRoute:
   parentGatewaySectionName: http-dev
   hostnames:
   - dev.admedia.com
-
 features:
   RetryAnalysis: true
   ExperimentTrafficRouting: true
-
 # --- ServiceMonitor in prod for stable, service‑based scraping ---
-
 monitoring:
   enabled: false
   type: servicemonitor
@@ -67,4 +64,3 @@ monitoring:
   portName: metrics
   interval: 30s
   path: /metrics
-
