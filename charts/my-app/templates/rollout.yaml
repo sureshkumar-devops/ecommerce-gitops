@@ -42,7 +42,7 @@ spec:
       canaryService: {{ .Values.service.previewName }}
       stableService: {{ .Values.service.name }}
       trafficRouting:
-        gatewayAPI:
+        gateway-api:
           httpRoute: {{ .Values.env }}-httproute-my-app
       steps:
         - setWeight: 20

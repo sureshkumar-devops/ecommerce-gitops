@@ -2,31 +2,16 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: argo-rollouts-config
-  namespace: argo-rollouts
-  labels:
-    app.kubernetes.io/component: rollouts-controller
-    app.kubernetes.io/name: argo-rollouts
-    app.kubernetes.io/part-of: argo-rollouts
 data:
-  # 1. Gateway API Plugin Configuration
   trafficRouterPlugins: |
-    - name: "argoproj-labs/gatewayAPI"
-      # MANDATORY: The binary path
+    - name: "argoproj-labs/gateway-api"
       location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.11.0/gatewayapi-plugin-linux-amd64"
-      apiVersion: gateway.networking.k8s.io/v1
-      kind: HTTPRoute
-      # Default search parameters
-      namespace: {{ .Values.httpRoute.parentGatewayNamespace | default "nginx-gateway" }}
-      sectionName: {{ .Values.httpRoute.parentGatewaySectionName | default "http-prod" }}
-
-  # 2. Prometheus Provider Configuration
+    - name: "argoproj-labs/gatewayAPI"
+      location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.11.0/gatewayapi-plugin-linux-amd64"
   prometheus: |
-    address: {{ .Values.analysis.prometheus.address | default "http://prometheus-operated.monitoring.svc.cluster.local:9090" }}
+    address: http://prometheus-operated.monitoring.svc.cluster.local:9090
     timeout: 30
-
-  # 3. Global Feature Flags
   features: |
-    RetryAnalysis: {{ .Values.features.RetryAnalysis | default "true" | quote }}
-    ExperimentTrafficRouting: {{ .Values.features.ExperimentTrafficRouting | default "true" | quote }}
-
+    RetryAnalysis: "true"
+    ExperimentTrafficRouting: "true"
 
