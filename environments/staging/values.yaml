@@ -62,7 +62,7 @@ httpRoute:
 monitoring:
   enabled: true
   type: podmonitor
-  prometheusRelease: prometheus
+  prometheusRelease: monitoring
   portName: metrics
   interval: 30s
   path: /metrics

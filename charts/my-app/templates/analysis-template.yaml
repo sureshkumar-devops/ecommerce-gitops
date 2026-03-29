@@ -5,10 +5,9 @@ metadata:
   namespace: {{ .Values.env }}
 spec:
   args:
-  - name: metricName
   - name: jobName
   metrics:
-  - name: "{{`{{args.metricName}}`}}"
+  - name: error-rate-check
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
     successCondition: "result < {{ .Values.analysis.successThreshold }}"

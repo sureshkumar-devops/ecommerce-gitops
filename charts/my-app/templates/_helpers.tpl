@@ -69,13 +69,18 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
-{{/*
-Create the name jobName in AnalysisTemplate for metrics
-*/}}
 
+
+{{/*
+Return the jobName used in Prometheus queries.
+For staging we use the app fullname (matches job label).
+For prod we use the Gateway API host (matches host label).
+*/}}
 {{- define "my-app.jobName" -}}
-{{- if eq .Values.env "prod" -}}
-{{ .Values.analysis.prometheus.ingress }}
+{{- if eq .Values.env "staging" -}}
+{{ include "my-app.fullname" . }}
+{{- else if eq .Values.env "prod" -}}
+{{ index .Values.httpRoute.hostnames 0 }}
 {{- else -}}
 {{ include "my-app.fullname" . }}
 {{- end -}}

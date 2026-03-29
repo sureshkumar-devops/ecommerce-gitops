@@ -63,7 +63,7 @@ httpRoute:
 monitoring:
   enabled: true
   type: servicemonitor
-  prometheusRelease: prometheus
+  prometheusRelease: monitoring
   portName: metrics
   interval: 30s
   path: /metrics

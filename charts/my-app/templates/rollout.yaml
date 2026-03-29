@@ -51,8 +51,6 @@ spec:
             templates:
             - templateName: {{ .Values.env }}-error-rate-check
             args:
-            - name: metricName
-              value: error-rate-canary
             - name: jobName
               value: {{ include "my-app.jobName" . | quote }}
         {{- end }}
@@ -71,16 +69,12 @@ spec:
         templates:
         - templateName: {{ .Values.env }}-error-rate-check
         args:
-        - name: metricName
-          value: error-rate-pre
         - name: jobName
           value: {{ include "my-app.jobName" . | quote }}
       postPromotionAnalysis:
         templates:
         - templateName: {{ .Values.env }}-error-rate-check
         args:
-        - name: metricName
-          value: error-rate-post
         - name: jobName
           value: {{ include "my-app.jobName" . | quote }}
       {{- end }}
