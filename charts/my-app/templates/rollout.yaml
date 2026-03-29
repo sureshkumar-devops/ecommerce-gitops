@@ -42,8 +42,10 @@ spec:
       canaryService: {{ .Values.service.previewName }}
       stableService: {{ .Values.service.name }}
       trafficRouting:
-        gateway-api:
-          httpRoute: {{ .Values.env }}-httproute-my-app
+        plugins:
+         - name: argoproj-labs/gateway-api
+	   config:
+	     httpRoute: {{ .Values.env }}-httproute-my-app
       steps:
         - setWeight: 20
         {{- if .Values.analysis.enabled }}
