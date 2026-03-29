@@ -7,7 +7,7 @@ replicaCount: 2
 deploymentStrategy: canary
 image:
   repository: lehardocker/ecommerce-app
-  tag: "stag-31d0c08"
+  tag: "stag-a305d6a"
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
@@ -57,11 +57,9 @@ httpRoute:
   parentGatewaySectionName: http-staging
   hostnames:
   - staging.admedia.com
-
 features:
   RetryAnalysis: true
   ExperimentTrafficRouting: true
-
 # --- PodMonitor in staging to learn direct pod scraping. ---
 monitoring:
   enabled: true
