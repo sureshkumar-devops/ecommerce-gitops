@@ -10,7 +10,7 @@ data:
       location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.11.0/gatewayapi-plugin-linux-amd64"
   prometheus: |
     address: http://prometheus-operated.monitoring.svc.cluster.local:9090
-    timeout: 30
+    timeout: 31
   features: |
     RetryAnalysis: "true"
     ExperimentTrafficRouting: "true"
