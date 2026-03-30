@@ -24,7 +24,8 @@ spec:
 
 # 2. THE PREVIEW / CANARY SERVICE
 # Only created if we are NOT doing a simple "deployment"
-{{- if ne .Values.deploymentStrategy "deployment" }}
+#{- if ne .Values.deploymentStrategy "deployment" }}
+{{- if and .Values.service.enabled (ne .Values.deploymentStrategy "deployment") }}
 apiVersion: v1
 kind: Service
 metadata:
