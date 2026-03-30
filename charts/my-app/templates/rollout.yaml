@@ -1,4 +1,5 @@
-{{- if ne .Values.deploymentStrategy "deployment" }}
+#{{- if ne .Values.deploymentStrategy "deployment" }}
+{{- if and (ne .Values.deploymentStrategy "deployment") .Values.rollout.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:

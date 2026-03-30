@@ -65,9 +65,12 @@ features:
   ExperimentTrafficRouting: true
 # --- PodMonitor in staging to learn direct pod scraping. ---
 monitoring:
-  enabled: true
+  enabled: false
   type: podmonitor
   prometheusRelease: monitoring
   portName: metrics
   interval: 30s
   path: /metrics
+
+rollout:
+  enabled: false
