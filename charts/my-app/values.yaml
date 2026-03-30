@@ -1,6 +1,6 @@
 # --- Global Environment Identifier ---
 
-env: ""
+env: dev
 
 replicaCount: 1   # Canary needs at least 2 to show the split (e.g., 1 old, 1 new)
 deploymentStrategy: deployment
@@ -32,7 +32,8 @@ livenessProbe:
 # --- Service Configuration ---
     
 service:
-  name: dev-svc-my-app  # Ensure this matches your HTTPRoute backendRef
+  name: dev-my-app-svc-active # Ensure this matches your HTTPRoute backendRef
+  previewName: dev-my-app-svc-preview
   type: ClusterIP
   port: 80
   targetPort: 3000

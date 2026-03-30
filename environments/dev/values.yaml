@@ -10,7 +10,8 @@ image:
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
-  name: dev-svc-my-app
+  name: dev-my-app-svc-active
+  previewName: dev-my-app-svc-preview
   port: 80 # external service port
   targetPort: 3000 # matches app inside container
 # --- Container & Resource Settings ---
