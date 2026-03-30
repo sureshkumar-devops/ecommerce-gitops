@@ -20,22 +20,26 @@ spec:
         query: |
           {{- if eq .Values.env "staging" }}
           # Staging: filter by job label
-          ( sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}",status=~"5.."}[1m])) or vector(0))
-          /
-          ( sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m])) or vector(1))
+          scalar(
+            ( sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}",status=~"5.."}[1m])) or vector(0))
+            /
+            ( sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m])) or vector(1)))
           {{- else if eq .Values.env "prod" }}
           # Prod: filter by host label
+          scalar(
           ( sum(rate(nginx_http_requests_total{host="{{`{{args.jobName}}`}}",status=~"5.."}[1m])) or vector(0))
           /
-          ( sum(rate(nginx_http_requests_total{host="{{`{{args.jobName}}`}}"}[1m])) or vector(1))
+          ( sum(rate(nginx_http_requests_total{host="{{`{{args.jobName}}`}}"}[1m])) or vector(1)))
           {{- else if eq .Values.env "dev" }}
           # Dev: filter by job label, shorter window for fast feedback
+          scalar(
           ( sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}",status=~"5.."}[30s])) or vector(0))
           /
-          ( sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[30s])) or vector(1))
+          ( sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[30s])) or vector(1)))
           {{- else }}
           # Default fallback
+          scalar(
           ( sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}",status=~"5.."}[1m])) or vector(0))
           /
-          ( sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m])) or vector(1))
+          ( sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m])) or vector(1)))
           {{- end }}
