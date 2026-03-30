@@ -37,35 +37,35 @@ spec:
             initialDelaySeconds: 20
 
   strategy:
-    {{- if eq .Values.deploymentStrategy "canary" }}
+{{- if eq .Values.deploymentStrategy "canary" }}
     canary:
       canaryService: {{ .Values.service.previewName }}
       stableService: {{ .Values.service.name }}
       trafficRouting:
-        gateway-api:
-          httpRoute: {{ .Values.env }}-httproute-my-app
+        plugins:
+          argoproj-labs/gateway-api:
+            httpRoute: {{ .Values.env }}-httproute-my-app
       steps:
         - setWeight: 20
-        {{- if .Values.analysis.enabled }}
+{{- if .Values.analysis.enabled }}
         - analysis:
             templates:
             - templateName: {{ .Values.env }}-error-rate-check
             args:
             - name: jobName
               value: {{ include "my-app.jobName" . | quote }}
-        {{- end }}
+{{- end }}
         - pause: { duration: 30s }
         - setWeight: 50
         - pause: { duration: 30s }
         - setWeight: 100
-    {{- end }}
-
-    {{- if eq .Values.deploymentStrategy "bluegreen" }}
+{{- end }}
+{{- if eq .Values.deploymentStrategy "bluegreen" }}
     blueGreen:
       activeService: {{ .Values.service.name }}
       previewService: {{ .Values.service.previewName }}
       autoPromotionEnabled: false
-      {{- if .Values.analysis.enabled }}
+{{- if .Values.analysis.enabled }}
       prePromotionAnalysis:
         templates:
         - templateName: {{ .Values.env }}-error-rate-check
@@ -78,6 +78,7 @@ spec:
         args:
         - name: jobName
           value: {{ include "my-app.jobName" . | quote }}
-      {{- end }}
-    {{- end }}
 {{- end }}
+{{- end }}
+{{- end }}
+
