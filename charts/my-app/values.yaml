@@ -49,6 +49,21 @@ gateway:
   enabled: true
   className: nginx
 
+
+analysis:
+  enabled: false        # default off, override per env
+  interval: 30s
+  count: 3
+  successThreshold: 0.05
+  failureThreshold: 0.05
+  retryOnError: true
+  prometheus:
+    address: http://prometheus-operated.monitoring.svc.cluster.local:9090
+    job: my-app
+
+
+
+
 httpRoute:
   enabled: true
   parentGatewayName: dev-gateway
