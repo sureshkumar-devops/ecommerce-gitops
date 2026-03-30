@@ -6,11 +6,12 @@ replicaCount: 1
 deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
-  tag: "dev-a4252ba" # Image Updater will replace this with dev-<sha>
+  tag: "dev-8739b6a" # Image Updater will replace this with dev-<sha>
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
-  name: dev-svc-my-app
+  name: dev-my-app-svc-active
+  previewName: dev-my-app-svc-preview
   port: 80 # external service port
   targetPort: 3000 # matches app inside container
 # --- Container & Resource Settings ---
@@ -45,7 +46,8 @@ analysis:
   retryOnError: true
   prometheus:
     # Double check this internal URL exists in your Dev cluster!
-    address: http://prometheus-operated.monitoring.svc.cluster.local:9090
+    #address: http://prometheus-operated.monitoring.svc.cluster.local:9090
+    address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
     job: my-app-dev # Usually dev jobs have a -dev suffix
 httpRoute:
   enabled: true

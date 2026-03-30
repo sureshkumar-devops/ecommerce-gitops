@@ -2,19 +2,17 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  # Generates: dev-svc-gapi-my-app, prod-svc-gapi-my-app, etc.
-  name: {{ .Values.env }}-httproute-my-app
+  name: {{ .Values.env }}-my-app-httproute
   namespace: {{ .Values.env }}
   labels:
     app.kubernetes.io/managed-by: helm
     app.kubernetes.io/part-of: ecommerce
     app.kubernetes.io/name: {{ .Chart.Name }}
     environment: {{ .Values.env }}
-    gitops.branch: {{ .Values.gitopsBranch }}
+    gitops.branch: {{ .Values.gitopsBranch | default "master" }}
 spec:
   parentRefs:
     - name: {{ .Values.httpRoute.parentGatewayName }}
-      # Useful if the gateway is in a different namespace
       {{- if .Values.httpRoute.parentGatewayNamespace }}
       namespace: {{ .Values.httpRoute.parentGatewayNamespace }}
       {{- end }}
@@ -31,15 +29,12 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        # Main Active Service
-        - name: {{ .Values.service.name }}
+        - name: {{ include "my-app.serviceNameActive" . }}
           port: {{ .Values.service.port }}
           weight: 100
-        # Only add the preview backend if previewName exists in values.yaml    
-        # Preview Service (Ready for Rollouts/testing)
         {{- if .Values.service.previewName }}
-        - name: {{ .Values.service.previewName }}
-          port: {{ .Values.service.port }} 
+        - name: {{ include "my-app.serviceNamePreview" . }}
+          port: {{ .Values.service.port }}
           weight: 0
-        {{- end}}    
+        {{- end }}
 {{- end }}

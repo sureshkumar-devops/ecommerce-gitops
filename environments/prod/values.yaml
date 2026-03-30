@@ -7,12 +7,12 @@ replicaCount: 3
 deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
-  tag: "v2026.03.30-a4252ba"
+  tag: "v2026.03.30-8739b6a"
   pullPolicy: Always
 # --- Service Configuration ---
 service:
-  name: prod-svc-my-app-active
-  previewName: prod-svc-my-app-preview # Add this line
+  name: prod-my-app-svc-active
+  previewName: prod-my-app-svc-preview # Add this line
   port: 80
   targetPort: 3000 # matches app inside container
 # --- Container & Probe Settings ---   
@@ -48,7 +48,8 @@ analysis:
   failureThreshold: 0.05
   retryOnError: true
   prometheus:
-    address: http://prometheus-operated.monitoring.svc.cluster.local:9090
+    #address: http://prometheus-operated.monitoring.svc.cluster.local:9090
+    address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
     ingress: my-app-prod-ingress
 # --- Gateway API Configuration --
 httpRoute:
