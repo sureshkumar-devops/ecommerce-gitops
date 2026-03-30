@@ -46,7 +46,8 @@ analysis:
   retryOnError: true
   prometheus:
     # Double check this internal URL exists in your Dev cluster!
-    address: http://prometheus-operated.monitoring.svc.cluster.local:9090
+    #address: http://prometheus-operated.monitoring.svc.cluster.local:9090
+    address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
     job: my-app-dev # Usually dev jobs have a -dev suffix
 httpRoute:
   enabled: true

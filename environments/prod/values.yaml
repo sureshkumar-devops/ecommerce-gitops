@@ -48,7 +48,8 @@ analysis:
   failureThreshold: 0.05
   retryOnError: true
   prometheus:
-    address: http://prometheus-operated.monitoring.svc.cluster.local:9090
+    #address: http://prometheus-operated.monitoring.svc.cluster.local:9090
+    address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
     ingress: my-app-prod-ingress
 # --- Gateway API Configuration --
 httpRoute:
