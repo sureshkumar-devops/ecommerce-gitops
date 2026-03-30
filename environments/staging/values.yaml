@@ -11,7 +11,7 @@ image:
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
-  enabled: false
+  enabled: true
   name: staging-my-app-svc-active # stable service
   previewName: staging-my-app-svc-preview # canary/new service
   port: 80
@@ -54,7 +54,7 @@ analysis:
     job: my-app-staging
 # --- Gateway API Configuration --
 httpRoute:
-  enabled: false
+  enabled: true
   parentGatewayName: shared-gateway
   parentGatewayNamespace: nginx-gateway
   parentGatewaySectionName: http-staging
@@ -73,4 +73,4 @@ monitoring:
   path: /metrics
 
 rollout:
-  enabled: false
+  enabled: true

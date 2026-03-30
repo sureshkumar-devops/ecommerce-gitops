@@ -32,6 +32,7 @@ livenessProbe:
 # --- Service Configuration ---
     
 service:
+  enabled: true
   name: dev-my-app-svc-active # Ensure this matches your HTTPRoute backendRef
   previewName: dev-my-app-svc-preview
   type: ClusterIP
@@ -93,6 +94,8 @@ ingress:
      secretName: dev-admedia-tls     
 
         
+rollout:
+  enabled: true
 
 autoscaling:
   enabled: false

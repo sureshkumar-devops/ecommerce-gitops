@@ -10,6 +10,7 @@ image:
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
+  enabled: true
   name: dev-my-app-svc-active
   previewName: dev-my-app-svc-preview
   port: 80 # external service port
@@ -38,7 +39,7 @@ livenessProbe:
   periodSeconds: 10
   failureThreshold: 3
 analysis:
-  enabled: true
+  enabled: false
   interval: 30s
   count: 2 # Reduced from 3 to 2 for faster Dev cycles
   successThreshold: 0.05 # Slightly more relaxed (10%) for unstable dev traffic
@@ -50,7 +51,7 @@ analysis:
     address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
     job: my-app-dev # Usually dev jobs have a -dev suffix
 httpRoute:
-  enabled: true
+  enabled: false
   parentGatewayName: shared-gateway
   parentGatewayNamespace: nginx-gateway
   parentGatewaySectionName: http-dev
@@ -67,3 +68,8 @@ monitoring:
   portName: metrics
   interval: 30s
   path: /metrics
+
+rollout:
+  enabled: false   # no Rollout, just Deployment
+
+
