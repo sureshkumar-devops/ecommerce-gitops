@@ -6,7 +6,7 @@ replicaCount: 1
 deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
-  tag: "dev-a305d6a" # Image Updater will replace this with dev-<sha>
+  tag: "dev-dc9714f" # Image Updater will replace this with dev-<sha>
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
@@ -40,8 +40,9 @@ analysis:
   enabled: true
   interval: 30s
   count: 2 # Reduced from 3 to 2 for faster Dev cycles
-  successThreshold: 0.1 # Slightly more relaxed (10%) for unstable dev traffic
-  failureThreshold: 0.1 # Slightly more relaxed
+  successThreshold: 0.05 # Slightly more relaxed (10%) for unstable dev traffic
+  failureThreshold: 0.05 # Slightly more relaxed
+  retryOnError: true
   prometheus:
     # Double check this internal URL exists in your Dev cluster!
     address: http://prometheus-operated.monitoring.svc.cluster.local:9090

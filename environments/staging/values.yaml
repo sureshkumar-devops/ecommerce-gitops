@@ -7,7 +7,7 @@ replicaCount: 2
 deploymentStrategy: canary
 image:
   repository: lehardocker/ecommerce-app
-  tag: "stag-a305d6a"
+  tag: "stag-dc9714f"
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
@@ -46,9 +46,10 @@ analysis:
   count: 3
   successThreshold: 0.05
   failureThreshold: 0.05
+  retryOnError: true
   prometheus:
     address: http://prometheus-operated.monitoring.svc.cluster.local:9090
-    job: my-app
+    job: my-app-staging
 # --- Gateway API Configuration --
 httpRoute:
   enabled: true

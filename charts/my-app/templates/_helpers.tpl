@@ -73,14 +73,14 @@ Create the name of the service account to use
 
 {{/*
 Return the jobName used in Prometheus queries.
-For staging we use the app fullname (matches job label).
-For prod we use the Gateway API host (matches host label).
 */}}
 {{- define "my-app.jobName" -}}
-{{- if eq .Values.env "staging" -}}
-{{ include "my-app.fullname" . }}
-{{- else if eq .Values.env "prod" -}}
+{{- if eq .Values.env "prod" -}}
 {{ index .Values.httpRoute.hostnames 0 }}
+{{- else if eq .Values.env "staging" -}}
+{{ .Values.analysis.prometheus.job }}
+{{- else if eq .Values.env "dev" -}}
+{{ .Values.analysis.prometheus.job | default (include "my-app.fullname" .) }}
 {{- else -}}
 {{ include "my-app.fullname" . }}
 {{- end -}}
