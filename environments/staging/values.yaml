@@ -11,6 +11,7 @@ image:
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
+  enabled: false
   name: staging-my-app-svc-active # stable service
   previewName: staging-my-app-svc-preview # canary/new service
   port: 80
