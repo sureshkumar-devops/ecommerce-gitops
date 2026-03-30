@@ -46,6 +46,7 @@ analysis:
   count: 3
   successThreshold: 0.05
   failureThreshold: 0.05
+  retryOnError: true
   prometheus:
     address: http://prometheus-operated.monitoring.svc.cluster.local:9090
     ingress: my-app-prod-ingress
