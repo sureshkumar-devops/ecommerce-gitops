@@ -29,11 +29,11 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: {{ .Values.service.name }}
+        - name: {{ include "my-app.serviceNameActive" . }}
           port: {{ .Values.service.port }}
           weight: 100
         {{- if .Values.service.previewName }}
-        - name: {{ .Values.service.previewName }}
+        - name: {{ include "my-app.serviceNamePreview" . }}
           port: {{ .Values.service.port }}
           weight: 0
         {{- end }}

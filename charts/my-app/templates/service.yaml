@@ -3,7 +3,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.service.name }}  # Matches 'stableService' or 'activeService'
+  #name: {{ .Values.service.name }}  # Matches 'stableService' or 'activeService'
+  name: {{ include "my-app.serviceNameActive" . }}
   namespace: {{ .Values.env }}
   labels:
     app.kubernetes.io/name: {{ .Chart.Name }}
@@ -26,7 +27,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.service.previewName }} # Matches 'canaryService' or 'previewService'
+  #name: {{ .Values.service.previewName }} # Matches 'canaryService' or 'previewService'
+  name: {{ include "my-app.serviceNamePreview" . }}
   namespace: {{ .Values.env }}
   labels:
     app.kubernetes.io/name: {{ .Chart.Name }}
