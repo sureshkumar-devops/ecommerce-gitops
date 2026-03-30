@@ -42,7 +42,7 @@ livenessProbe:
   failureThreshold: 3
 # --- Analysis Metrics Application Level ---
 analysis:
-  enabled: true
+  enabled: false
   interval: 30s
   count: 3
   successThreshold: 0.05
@@ -54,7 +54,7 @@ analysis:
     job: my-app-staging
 # --- Gateway API Configuration --
 httpRoute:
-  enabled: true
+  enabled: false
   parentGatewayName: shared-gateway
   parentGatewayNamespace: nginx-gateway
   parentGatewaySectionName: http-staging
