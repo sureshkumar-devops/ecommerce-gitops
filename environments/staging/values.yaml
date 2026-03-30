@@ -7,12 +7,12 @@ replicaCount: 2
 deploymentStrategy: canary
 image:
   repository: lehardocker/ecommerce-app
-  tag: "stag-a4252ba"
+  tag: "stag-8739b6a"
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
-  name: staging-svc-my-app-active # stable service
-  previewName: staging-svc-my-app-preview # canary/new service  
+  name: staging-my-app-svc-active # stable service
+  previewName: staging-my-app-svc-preview # canary/new service
   port: 80
   targetPort: 3000
 # --- Container & Resource Settings ---
@@ -48,7 +48,8 @@ analysis:
   failureThreshold: 0.05
   retryOnError: true
   prometheus:
-    address: http://prometheus-operated.monitoring.svc.cluster.local:9090
+    #address: http://prometheus-operated.monitoring.svc.cluster.local:9090
+    address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
     job: my-app-staging
 # --- Gateway API Configuration --
 httpRoute:

@@ -2,7 +2,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ .Values.env }}-{{ include "my-app.fullname" . }}-servicemonitor
+  name: {{ include "my-app.fullname" . }}-servicemonitor
   namespace: {{ .Release.Namespace }}
   labels:
     release: {{ .Values.monitoring.prometheusRelease }}
@@ -21,7 +21,7 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: {{ .Values.env }}-{{ include "my-app.fullname" . }}-podmonitor
+  name: {{ include "my-app.fullname" . }}-podmonitor
   namespace: {{ .Release.Namespace }}
   labels:
     release: {{ .Values.monitoring.prometheusRelease }}
