@@ -49,7 +49,7 @@ analysis:
   retryOnError: true
   prometheus:
     address: http://prometheus-operated.monitoring.svc.cluster.local:9090
-    job: my-app
+    job: my-app-staging
 # --- Gateway API Configuration --
 httpRoute:
   enabled: true
