@@ -52,7 +52,7 @@ gateway:
 
 
 analysis:
-  enabled: false        # default off, override per env
+  enabled: true        # default off, override per env
   interval: 30s
   count: 3
   successThreshold: 0.05
