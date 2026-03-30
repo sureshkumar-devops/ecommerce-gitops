@@ -12,7 +12,8 @@ spec:
     count: {{ .Values.analysis.count }}
     successCondition: "result < {{ .Values.analysis.successThreshold }}"
     failureCondition: "result >= {{ .Values.analysis.failureThreshold }}"
-    consecutiveErrorLimit: 4 
+    consecutiveErrorLimit: 4
+    retryOnError: true   # <-- this enables automatic retries 
     provider:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
