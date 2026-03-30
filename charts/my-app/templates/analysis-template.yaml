@@ -13,7 +13,8 @@ spec:
     successCondition: "result < {{ .Values.analysis.successThreshold }}"
     failureCondition: "result >= {{ .Values.analysis.failureThreshold }}"
     consecutiveErrorLimit: 4
-    retryOnError: {{ .Values.analysis.retryOnError }}  # <-- this enables automatic retries
+    retryOnError: {{ .Values.analysis.retryOnError }}
+    retryOnError: {{ .Values.analysis.retryOnError | default false }}  
     provider:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
