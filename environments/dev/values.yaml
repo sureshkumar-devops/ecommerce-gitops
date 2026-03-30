@@ -6,7 +6,7 @@ replicaCount: 1
 deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
-  tag: "dev-a4252ba" # Image Updater will replace this with dev-<sha>
+  tag: "dev-8739b6a" # Image Updater will replace this with dev-<sha>
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
