@@ -29,8 +29,8 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
           ports:
-            - name: http
-              containerPort: {{ .Values.containerPort | default 3000 }}
+            - name: {{ .Values.monitoring.portName | default "metrics" }} # Change 'http' to this
+              containerPort: {{ .Values.service.targetPort | default 3000 }}
 
           readinessProbe:
             httpGet:
