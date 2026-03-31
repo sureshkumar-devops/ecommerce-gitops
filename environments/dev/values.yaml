@@ -6,7 +6,7 @@ replicaCount: 1
 deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
-  tag: "dev-a27e7f2" # Image Updater will replace this with dev-<sha>
+  tag: "dev-e3731df" # Image Updater will replace this with dev-<sha>
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
@@ -38,7 +38,6 @@ livenessProbe:
   timeoutSeconds: 2
   periodSeconds: 10
   failureThreshold: 3
-
 analysis:
   enabled: false
   interval: 30s
@@ -69,8 +68,5 @@ monitoring:
   portName: metrics
   interval: 30s
   path: /metrics
-
 rollout:
-  enabled: false   # no Rollout, just Deployment
-
-
+  enabled: false # no Rollout, just Deployment

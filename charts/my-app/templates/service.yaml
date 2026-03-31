@@ -16,7 +16,7 @@ spec:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
       protocol: TCP
-      name: http
+      name: {{ .Values.monitoring.portName | default "metrics" }} 
   selector:
     {{- include "my-app.selectorLabels" . | nindent 4 }}
 {{- end }}
@@ -41,7 +41,7 @@ spec:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
       protocol: TCP
-      name: http
+      name: {{ .Values.monitoring.portName | default "metrics" }}
   selector:
     {{- include "my-app.selectorLabels" . | nindent 4 }}
 {{- end }}

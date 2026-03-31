@@ -29,8 +29,8 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
           ports:
-            - name: http
-              containerPort: {{ .Values.containerPort | default 3000 }}
+            - name: {{ .Values.monitoring.portName | default "metrics" }} # Change 'http' to this
+              containerPort: {{ .Values.service.targetPort | default 3000 }}
 
           readinessProbe:
             httpGet:
@@ -50,10 +50,10 @@ spec:
       canaryService: {{ .Values.service.previewName }}
       stableService: {{ .Values.service.name }}
 
-      trafficRouting:
-        plugins:
-          argoproj-labs/gateway-api:
-            httpRoute: {{ .Values.env }}-my-app-httproute
+      #trafficRouting:
+      # plugins:
+      #   argoproj-labs/gateway-api:
+      #     httpRoute: {{ .Values.env }}-my-app-httproute
       
       # 🔥 retain analysis history
       analysis:
@@ -63,6 +63,7 @@ spec:
             
       steps:
         - setWeight: 20
+        - pause: { duration: 30s }   # ✅ ADD THIS
 
 {{- if .Values.analysis.enabled }}
         - analysis:
@@ -72,9 +73,10 @@ spec:
             - name: jobName
               value: {{ include "my-app.jobName" . | quote }}
 {{- end }}
-        #- pause: { duration: 30s }
-
+        
+        - pause: { duration: 30s }
         - setWeight: 50
+        - pause: { duration: 30s }
 
 {{- if .Values.analysis.enabled }}        
         - analysis:
