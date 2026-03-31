@@ -7,12 +7,20 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ .Chart.Name }}
     environment: {{ .Values.env }}
+    annotations:
+      notifications.argoproj.io/subscribe.on-analysis-failed.slack: "#devops-alerts"
 spec:
   replicas: {{ .Values.replicaCount | default 2 }}
   revisionHistoryLimit: 3
+
+  # 🔥 Add stability controls
+  progressDeadlineSeconds: 300
+  abortScaleDownDelaySeconds: 30
+
   selector:
     matchLabels:
       {{- include "my-app.selectorLabels" . | nindent 6 }}
+
   template:
     metadata:
       labels:
@@ -25,11 +33,13 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.containerPort | default 3000 }}
+
           readinessProbe:
             httpGet:
               path: {{ .Values.probePath | default "/" }}
               port: {{ .Values.containerPort | default 3000 }}
             initialDelaySeconds: 10
+
           livenessProbe:
             httpGet:
               path: {{ .Values.probePath | default "/" }}
@@ -41,12 +51,21 @@ spec:
     canary:
       canaryService: {{ .Values.service.previewName }}
       stableService: {{ .Values.service.name }}
+
       trafficRouting:
         plugins:
           argoproj-labs/gateway-api:
             httpRoute: {{ .Values.env }}-my-app-httproute
+      
+      # 🔥 retain analysis history
+      analysis:
+        successfulRunHistoryLimit: 5
+        unsuccessfulRunHistoryLimit: 5       
+
+            
       steps:
         - setWeight: 20
+
 {{- if .Values.analysis.enabled }}
         - analysis:
             templates:
@@ -55,23 +74,37 @@ spec:
             - name: jobName
               value: {{ include "my-app.jobName" . | quote }}
 {{- end }}
-        - pause: { duration: 30s }
+        #- pause: { duration: 30s }
+
         - setWeight: 50
-        - pause: { duration: 30s }
+
+{{- if .Values.analysis.enabled }}        
+        - analysis:
+            templates:
+            - templateName: {{ .Values.env }}-error-rate-check
+            args:
+            - name: jobName
+              value: {{ include "my-app.jobName" . | quote }}
+{{- end }}              
+        #- pause: { duration: 30s }
         - setWeight: 100
 {{- end }}
+
 {{- if eq .Values.deploymentStrategy "bluegreen" }}
     blueGreen:
       activeService: {{ .Values.service.name }}
       previewService: {{ .Values.service.previewName }}
       autoPromotionEnabled: false
+
 {{- if .Values.analysis.enabled }}
+
       prePromotionAnalysis:
         templates:
         - templateName: {{ .Values.env }}-error-rate-check
         args:
         - name: jobName
           value: {{ include "my-app.jobName" . | quote }}
+
       postPromotionAnalysis:
         templates:
         - templateName: {{ .Values.env }}-error-rate-check

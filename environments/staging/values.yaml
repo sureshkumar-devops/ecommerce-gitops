@@ -45,8 +45,8 @@ analysis:
   enabled: true
   interval: 30s
   count: 3
-  successThreshold: 0.05
-  failureThreshold: 0.05
+  successThreshold: 0.02 # <2% errors → OK
+  failureThreshold: 0.05 # ≥5% errors → FAIL
   retryOnError: true
   prometheus:
     #address: http://prometheus-operated.monitoring.svc.cluster.local:9090
