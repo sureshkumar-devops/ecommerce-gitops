@@ -59,8 +59,9 @@ spec:
 
       trafficRouting:
        plugins:
-         argoproj-labs/gateway-api:
+         argoproj-labs/gatewayAPI:
            httpRoute: {{ .Values.env }}-my-app-httproute
+           namespace: {{ .Values.env }}
       
       # 🔥 retain analysis history
       #analysis:

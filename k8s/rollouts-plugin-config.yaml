@@ -5,7 +5,7 @@ metadata:
   namespace: argo-rollouts
 data:
   trafficRouterPlugins: |
-    - name: "argoproj-labs/gateway-api"
+    - name: "argoproj-labs/gatewayAPI"
       location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.11.0/gatewayapi-plugin-linux-amd64"
   prometheus: |
     address: http://prometheus-operated.monitoring.svc.cluster.local:9090
