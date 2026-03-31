@@ -50,10 +50,10 @@ spec:
       canaryService: {{ .Values.service.previewName }}
       stableService: {{ .Values.service.name }}
 
-      trafficRouting:
-        plugins:
-          argoproj-labs/gateway-api:
-            httpRoute: {{ .Values.env }}-my-app-httproute
+      #trafficRouting:
+      # plugins:
+      #   argoproj-labs/gateway-api:
+      #     httpRoute: {{ .Values.env }}-my-app-httproute
       
       # 🔥 retain analysis history
       analysis:
