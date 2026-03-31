@@ -73,12 +73,12 @@ Create the name of the service account to use
 
 {{/* Service name for active deployment */}}
 {{- define "my-app.serviceNameActive" -}}
-{{ .Values.env }}-{{ include "my-app.fullname" . }}-svc-active
+{{ .Values.env }}-{{ include "my-app.name" . }}-svc-active
 {{- end }}
 
 {{/* Service name for preview deployment */}}
 {{- define "my-app.serviceNamePreview" -}}
-{{ .Values.env }}-{{ include "my-app.fullname" . }}-svc-preview
+{{ .Values.env }}-{{ include "my-app.name" . }}-svc-preview
 {{- end }}
 
 

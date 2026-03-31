@@ -7,10 +7,11 @@ replicaCount: 3
 deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
-  tag: "v2026.03.30-8739b6a"
+  tag: "v2026.03.31-e3731df"
   pullPolicy: Always
 # --- Service Configuration ---
 service:
+  enabled: true
   name: prod-my-app-svc-active
   previewName: prod-my-app-svc-preview # Add this line
   port: 80
@@ -40,6 +41,7 @@ livenessProbe:
   periodSeconds: 10
   failureThreshold: 3
 # --- Analysis Metrics NGF (Nginx Gateway Fabrics) Level ---
+
 analysis:
   enabled: true
   interval: 30s
@@ -70,3 +72,5 @@ monitoring:
   portName: metrics
   interval: 30s
   path: /metrics
+rollout:
+  enabled: true
