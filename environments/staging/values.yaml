@@ -45,13 +45,18 @@ analysis:
   enabled: true
   interval: 30s
   count: 3
-  successThreshold: 0.02 # <2% errors → OK
-  failureThreshold: 0.05 # ≥5% errors → FAIL
-  retryOnError: true
+  #successThreshold: 0.02 # <2% errors → OK
+  #failureThreshold: 0.05 # ≥5% errors → FAIL
+  #retryOnError: true
+
+  errorRateThreshold: 0.05
+  successRateThreshold: 0.95
+  latencyThreshold: 0.5  
+
   prometheus:
     #address: http://prometheus-operated.monitoring.svc.cluster.local:9090
     address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
-    job: my-app-staging
+    #job: my-app-staging
 # --- Gateway API Configuration --
 httpRoute:
   enabled: true
