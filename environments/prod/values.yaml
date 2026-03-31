@@ -41,8 +41,9 @@ livenessProbe:
   periodSeconds: 10
   failureThreshold: 3
 # --- Analysis Metrics NGF (Nginx Gateway Fabrics) Level ---
+
 analysis:
-  enabled: false
+  enabled: true
   interval: 30s
   count: 3
   successThreshold: 0.05

@@ -38,6 +38,7 @@ livenessProbe:
   timeoutSeconds: 2
   periodSeconds: 10
   failureThreshold: 3
+
 analysis:
   enabled: false
   interval: 30s
