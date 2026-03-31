@@ -50,18 +50,19 @@ spec:
       canaryService: {{ .Values.service.previewName }}
       stableService: {{ .Values.service.name }}
 
-      #trafficRouting:
-      # plugins:
-      #   argoproj-labs/gateway-api:
-      #     httpRoute: {{ .Values.env }}-my-app-httproute
+      trafficRouting:
+       plugins:
+         argoproj-labs/gateway-api:
+           httpRoute: {{ .Values.env }}-my-app-httproute
       
       # 🔥 retain analysis history
-      analysis:
-        successfulRunHistoryLimit: 5
-        unsuccessfulRunHistoryLimit: 5       
+      #analysis:
+      #  successfulRunHistoryLimit: 5
+      #  unsuccessfulRunHistoryLimit: 5       
 
             
       steps:
+        # 🔹 STEP 1
         - setWeight: 20
         - pause: { duration: 30s }   # ✅ ADD THIS
 
@@ -74,8 +75,7 @@ spec:
             - name: jobName
               value: {{ include "my-app.jobName" . | quote }}
 {{- end }}
-        
-        - pause: { duration: 30s }
+        # 🔹 STEP 2
         - setWeight: 50
         - pause: { duration: 30s }
 
@@ -88,8 +88,17 @@ spec:
             - name: jobName
               value: {{ include "my-app.jobName" . | quote }}
 {{- end }}              
-        #- pause: { duration: 30s }
+        # 🔹 STEP 3 (FINAL)
         - setWeight: 100
+        - pause: { duration: 30s }
+{{- if .Values.analysis.enabled }}
+        - analysis:
+          templates:
+          - templateName: {{ .Values.env }}-app-health-check
+          args:
+          - name: jobName
+            value: {{ include "my-app.jobName" . | quote }}
+{{- end }}
 {{- end }}
 
 {{- if eq .Values.deploymentStrategy "bluegreen" }}
