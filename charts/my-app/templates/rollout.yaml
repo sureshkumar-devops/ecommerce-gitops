@@ -68,7 +68,8 @@ spec:
 {{- if .Values.analysis.enabled }}
         - analysis:
             templates:
-            - templateName: {{ .Values.env }}-error-rate-check
+            #- templateName: {{ .Values.env }}-error-rate-check
+            - templateName: {{ .Values.env }}-app-health-check 
             args:
             - name: jobName
               value: {{ include "my-app.jobName" . | quote }}
@@ -81,7 +82,8 @@ spec:
 {{- if .Values.analysis.enabled }}        
         - analysis:
             templates:
-            - templateName: {{ .Values.env }}-error-rate-check
+            #- templateName: {{ .Values.env }}-error-rate-check
+            - templateName: {{ .Values.env }}-app-health-check
             args:
             - name: jobName
               value: {{ include "my-app.jobName" . | quote }}

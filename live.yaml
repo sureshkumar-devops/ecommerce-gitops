@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  annotations:
+    argocd.argoproj.io/tracking-id: staging-my-app:argoproj.io/AnalysisTemplate:staging/staging-error-rate-check
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"argoproj.io/v1alpha1","kind":"AnalysisTemplate","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"staging-my-app:argoproj.io/AnalysisTemplate:staging/staging-error-rate-check"},"name":"staging-error-rate-check","namespace":"staging"},"spec":{"args":[{"name":"jobName"}],"metrics":[{"consecutiveErrorLimit":4,"count":3,"failureCondition":"result \u003e= 0.05","interval":"30s","name":"error-rate-check","provider":{"prometheus":{"address":"http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090","query":"scalar(\n  ( sum(rate(http_requests_total{job=\"my-app-staging\",status=~\"5..\"}[1m])) or vector(0))\n  /\n  ( sum(rate(http_requests_total{job=\"my-app-staging\" }[1m])) or vector(1))\n)\n"}},"retryOnError":true,"successCondition":"result \u003c 0.02"}]}}
+    meta.helm.sh/release-name: staging-my-app
+    meta.helm.sh/release-namespace: staging
+  creationTimestamp: "2026-03-30T20:09:28Z"
+  generation: 2
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  name: staging-error-rate-check
+  namespace: staging
+  resourceVersion: "1501002"
+  uid: 7ac20a1e-ad3e-4d9f-9276-483ecce5ac1a
+spec:
+  args:
+  - name: jobName
+  metrics:
+  - consecutiveErrorLimit: 4
+    count: 3
+    failureCondition: result >= 0.05
+    interval: 30s
+    name: error-rate-check
+    provider:
+      prometheus:
+        address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          scalar(
+            ( sum(rate(http_requests_total{job="my-app-staging",status=~"5.."}[1m])) or vector(0))
+            /
+            ( sum(rate(http_requests_total{job="my-app-staging" }[1m])) or vector(1))
+          )
+    successCondition: result < 0.02
