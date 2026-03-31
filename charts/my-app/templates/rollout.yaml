@@ -7,8 +7,6 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ .Chart.Name }}
     environment: {{ .Values.env }}
-    annotations:
-      notifications.argoproj.io/subscribe.on-analysis-failed.slack: "#devops-alerts"
 spec:
   replicas: {{ .Values.replicaCount | default 2 }}
   revisionHistoryLimit: 3
