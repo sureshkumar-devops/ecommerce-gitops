@@ -7,7 +7,7 @@ replicaCount: 3
 deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
-  tag: "v2026.03.31-23056f3"
+  tag: "v2026.03.31-44b67eb"
   pullPolicy: Always
 # --- Service Configuration ---
 service:
@@ -49,11 +49,10 @@ analysis:
   #successThreshold: 0.05
   #failureThreshold: 0.05
   #retryOnError: true
-  
+
   errorRateThreshold: 0.01
   successRateThreshold: 0.99
   latencyThreshold: 0.3
-
   prometheus:
     #address: http://prometheus-operated.monitoring.svc.cluster.local:9090
     address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
