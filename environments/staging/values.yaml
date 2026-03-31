@@ -7,7 +7,7 @@ replicaCount: 2
 deploymentStrategy: canary
 image:
   repository: lehardocker/ecommerce-app
-  tag: "stag-e3731df"
+  tag: "stag-83d1114"
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
