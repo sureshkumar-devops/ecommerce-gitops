@@ -44,7 +44,7 @@ spec:
       trafficRouting:
         plugins:
           argoproj-labs/gateway-api:
-            httpRoute: {{ .Values.env }}-httproute-my-app
+            httpRoute: {{ .Values.env }}-my-app-httproute
       steps:
         - setWeight: 20
 {{- if .Values.analysis.enabled }}
