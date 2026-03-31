@@ -7,6 +7,11 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ .Chart.Name }}
     environment: {{ .Values.env }}
+  annotations:
+    notifications.argoproj.io/subscribe.on-analysis-failed.slack: devops-alerts
+    notifications.argoproj.io/subscribe.on-rollout-aborted.slack: devops-alerts
+    notifications.argoproj.io/subscribe.on-rollout-success.slack: devops-alerts
+    notifications.argoproj.io/subscribe.on-rollout-completed.slack: devops-alerts 
 spec:
   replicas: {{ .Values.replicaCount | default 2 }}
   revisionHistoryLimit: 3
@@ -47,21 +52,24 @@ spec:
   strategy:
 {{- if eq .Values.deploymentStrategy "canary" }}
     canary:
+      abortScaleDownDelaySeconds: 30  # cleanup failed canary
+
       canaryService: {{ .Values.service.previewName }}
       stableService: {{ .Values.service.name }}
 
-      #trafficRouting:
-      # plugins:
-      #   argoproj-labs/gateway-api:
-      #     httpRoute: {{ .Values.env }}-my-app-httproute
+      trafficRouting:
+       plugins:
+         argoproj-labs/gateway-api:
+           httpRoute: {{ .Values.env }}-my-app-httproute
       
       # 🔥 retain analysis history
-      analysis:
-        successfulRunHistoryLimit: 5
-        unsuccessfulRunHistoryLimit: 5       
+      #analysis:
+      #  successfulRunHistoryLimit: 5
+      #  unsuccessfulRunHistoryLimit: 5       
 
             
       steps:
+        # 🔹 STEP 1
         - setWeight: 20
         - pause: { duration: 30s }   # ✅ ADD THIS
 
@@ -74,8 +82,7 @@ spec:
             - name: jobName
               value: {{ include "my-app.jobName" . | quote }}
 {{- end }}
-        
-        - pause: { duration: 30s }
+        # 🔹 STEP 2
         - setWeight: 50
         - pause: { duration: 30s }
 
@@ -88,8 +95,17 @@ spec:
             - name: jobName
               value: {{ include "my-app.jobName" . | quote }}
 {{- end }}              
-        #- pause: { duration: 30s }
+        # 🔹 STEP 3 (FINAL)
         - setWeight: 100
+        - pause: { duration: 30s }
+{{- if .Values.analysis.enabled }}
+        - analysis:
+          templates:
+          - templateName: {{ .Values.env }}-app-health-check
+          args:
+          - name: jobName
+            value: {{ include "my-app.jobName" . | quote }}
+{{- end }}
 {{- end }}
 
 {{- if eq .Values.deploymentStrategy "bluegreen" }}
@@ -102,14 +118,14 @@ spec:
 
       prePromotionAnalysis:
         templates:
-        - templateName: {{ .Values.env }}-error-rate-check
+        - templateName: {{ .Values.env }}-app-health-check
         args:
         - name: jobName
           value: {{ include "my-app.jobName" . | quote }}
 
       postPromotionAnalysis:
         templates:
-        - templateName: {{ .Values.env }}-error-rate-check
+        - templateName: {{ .Values.env }}-app-health-check
         args:
         - name: jobName
           value: {{ include "my-app.jobName" . | quote }}
