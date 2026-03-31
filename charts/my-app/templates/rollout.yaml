@@ -7,6 +7,11 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ .Chart.Name }}
     environment: {{ .Values.env }}
+  annotations:
+    notifications.argoproj.io/subscribe.on-analysis-failed.slack: devops-alerts
+    notifications.argoproj.io/subscribe.on-rollout-aborted.slack: devops-alerts
+    notifications.argoproj.io/subscribe.on-rollout-success.slack: devops-alerts
+    notifications.argoproj.io/subscribe.on-rollout-completed.slack: devops-alerts 
 spec:
   replicas: {{ .Values.replicaCount | default 2 }}
   revisionHistoryLimit: 3
@@ -47,6 +52,8 @@ spec:
   strategy:
 {{- if eq .Values.deploymentStrategy "canary" }}
     canary:
+      abortScaleDownDelaySeconds: 30  # cleanup failed canary
+
       canaryService: {{ .Values.service.previewName }}
       stableService: {{ .Values.service.name }}
 
