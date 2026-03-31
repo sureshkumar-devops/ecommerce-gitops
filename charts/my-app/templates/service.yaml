@@ -1,5 +1,6 @@
 # 1. THE MAIN / ACTIVE SERVICE
 # Always created for every environment (Dev, Staging, Prod)
+{{- if .Values.service.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -18,12 +19,13 @@ spec:
       name: http
   selector:
     {{- include "my-app.selectorLabels" . | nindent 4 }}
-
+{{- end }}
 ---
 
 # 2. THE PREVIEW / CANARY SERVICE
 # Only created if we are NOT doing a simple "deployment"
-{{- if ne .Values.deploymentStrategy "deployment" }}
+
+{{- if and .Values.service.enabled (ne .Values.deploymentStrategy "deployment") }}
 apiVersion: v1
 kind: Service
 metadata:

@@ -1,6 +1,6 @@
 # --- Global Environment Identifier ---
 
-env: dev
+env: ""
 
 replicaCount: 1   # Canary needs at least 2 to show the split (e.g., 1 old, 1 new)
 deploymentStrategy: deployment
@@ -32,6 +32,7 @@ livenessProbe:
 # --- Service Configuration ---
     
 service:
+  enabled: true
   name: dev-my-app-svc-active # Ensure this matches your HTTPRoute backendRef
   previewName: dev-my-app-svc-preview
   type: ClusterIP
@@ -50,9 +51,8 @@ gateway:
   enabled: true
   className: nginx
 
-
 analysis:
-  enabled: false        # default off, override per env
+  enabled: true        # default off, override per env
   interval: 30s
   count: 3
   successThreshold: 0.05
@@ -93,6 +93,8 @@ ingress:
      secretName: dev-admedia-tls     
 
         
+rollout:
+  enabled: true
 
 autoscaling:
   enabled: false
