@@ -4,6 +4,8 @@ kind: AnalysisTemplate
 metadata:
   name: {{ .Values.env }}-app-health-check
   namespace: {{ .Values.env }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   args:
     - name: jobName
