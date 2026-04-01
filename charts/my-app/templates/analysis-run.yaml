@@ -1,0 +1,20 @@
+{{- if eq .Values.env "dev" }}
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisRun
+metadata:
+  # generateName creates a new unique run for every deployment
+  generateName: {{ include "my-app.fullname" . }}-health-check-
+  namespace: {{ .Values.env }}
+  annotations:
+    # 💡 This tells Argo CD to run this AFTER the deployment syncs
+    argocd.argoproj.io/hook: PostSync
+    # Optional: Deletes the old run once a new one starts to keep the UI clean
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+{{- if .Values.analysis.enabled }}
+  templateName: dev-app-health-check
+  args:
+    - name: jobName
+      value: {{ .Values.jobName | default "my-app" | quote }}
+{{- end }}
+{{- end }}

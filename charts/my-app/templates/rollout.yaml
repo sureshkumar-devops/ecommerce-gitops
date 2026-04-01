@@ -14,7 +14,7 @@ metadata:
     notifications.argoproj.io/subscribe.on-rollout-completed.slack: devops-alerts 
 spec:
   replicas: {{ .Values.replicaCount | default 2 }}
-  revisionHistoryLimit: 3
+  revisionHistoryLimit: 2
 
   # 🔥 Add stability controls
   progressDeadlineSeconds: 300
@@ -59,8 +59,9 @@ spec:
 
       trafficRouting:
        plugins:
-         argoproj-labs/gateway-api:
+         argoproj-labs/gatewayAPI:
            httpRoute: {{ .Values.env }}-my-app-httproute
+           namespace: {{ .Values.env }}
       
       # 🔥 retain analysis history
       #analysis:
@@ -71,7 +72,7 @@ spec:
       steps:
         # 🔹 STEP 1
         - setWeight: 20
-        - pause: { duration: 30s }   # ✅ ADD THIS
+        - pause: { duration: 1m }   # ✅ ADD THIS
 
 {{- if .Values.analysis.enabled }}
         - analysis:
@@ -84,7 +85,7 @@ spec:
 {{- end }}
         # 🔹 STEP 2
         - setWeight: 50
-        - pause: { duration: 30s }
+        - pause: { duration: 1m }
 
 {{- if .Values.analysis.enabled }}        
         - analysis:
@@ -97,7 +98,7 @@ spec:
 {{- end }}              
         # 🔹 STEP 3 (FINAL)
         - setWeight: 100
-        - pause: { duration: 30s }
+        - pause: { duration: 2m }
 {{- if .Values.analysis.enabled }}
         - analysis:
           templates:
@@ -112,7 +113,8 @@ spec:
     blueGreen:
       activeService: {{ .Values.service.name }}
       previewService: {{ .Values.service.previewName }}
-      autoPromotionEnabled: false
+      # 💡 Change this to true to automate the rollout
+      autoPromotionEnabled: true
 
 {{- if .Values.analysis.enabled }}
 

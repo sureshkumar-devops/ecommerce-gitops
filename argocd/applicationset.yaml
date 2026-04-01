@@ -26,7 +26,14 @@ spec:
       environment: '{{env}}'
       app.kubernetes.io/name: ecommerce-app
       gitops.branch: '{{branch}}'  
+
    spec:
+    ignoreDifferences:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      jsonPointers:
+        - /spec/rules/0/backendRefs
+
     project: default
     source:
      repoURL: https://github.com/sureshkumar-devops/ecommerce-gitops.git
