@@ -7,7 +7,7 @@ replicaCount: 2
 deploymentStrategy: canary
 image:
   repository: lehardocker/ecommerce-app
-  tag: "stag-44b67eb"
+  tag: "stag-72b9401"
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
@@ -48,10 +48,10 @@ analysis:
   traffic:
     min: 10
   error:
-    RateThreshold: 0.02
+    threshold: 0.02
     consecutiveLimit: 2
   success:
-    RateThreshold: 0.98
+    threshold: 0.98
   latency:
     Threshold: 0.5
   prometheus:

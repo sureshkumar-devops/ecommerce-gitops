@@ -53,11 +53,30 @@ gateway:
 
 analysis:
   enabled: true        # default off, override per env
+  name: app-health-check
+
+  # Common timing (balanced)
   interval: 30s
   count: 3
-  successThreshold: 0.05
-  failureThreshold: 0.05
-  retryOnError: true
+
+  # 🔹 Traffic Gate (prevents false success)
+  traffic:
+    min: 10
+
+  # 🔹 Error Rate (2% allowed)
+  error:
+    threshold: 0.02
+    consecutiveLimit: 2
+
+  # 🔹 Success Rate (>= 98%)
+  success:
+    threshold: 0.98
+
+  # 🔹 Latency P95 (500ms)
+  latency:
+    threshold: 0.5
+  
+
   prometheus:
     #address: http://prometheus-operated.monitoring.svc.cluster.local:9090
     address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090

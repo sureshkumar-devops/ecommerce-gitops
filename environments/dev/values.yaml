@@ -6,7 +6,7 @@ replicaCount: 1
 deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
-  tag: "dev-44b67eb" # Image Updater will replace this with dev-<sha>
+  tag: "dev-72b9401" # Image Updater will replace this with dev-<sha>
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
@@ -38,8 +38,6 @@ livenessProbe:
   timeoutSeconds: 2
   periodSeconds: 10
   failureThreshold: 3
-
-
 analysis:
   enabled: true
   interval: 15s
@@ -47,22 +45,17 @@ analysis:
   # thresholds
   traffic:
     min: 5 # very low traffic allowed
-  
   error:
-    RateThreshold: 0.05 # 5% allowed <5% errors
+    threshold: 0.05 # 5% allowed <5% errors
     consecutiveLimit: 3
-
   success:
-    RateThreshold: 0.95 # >95% success
-
+    threshold: 0.95 # >95% success
   latency:
     Threshold: 1.0 # 1 sec allowed
-
   prometheus:
     #address: http://prometheus-operated.monitoring.svc.cluster.local:9090
     address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
     #job: dev-my-app-job # Usually dev jobs have a -dev suffix
-
 httpRoute:
   enabled: true
   parentGatewayName: shared-gateway
@@ -75,7 +68,7 @@ features:
   ExperimentTrafficRouting: true
 # --- ServiceMonitor in prod for stable, service‑based scraping ---
 monitoring:
-  enabled: false 
+  enabled: false
   type: servicemonitor
   prometheusRelease: prometheus
   portName: metrics
