@@ -10,58 +10,69 @@ spec:
 
   metrics:
 
+  # 🔹 Traffic Gate
+  - name: traffic-volume
+    interval: {{ .Values.analysis.interval }}
+    count: {{ .Values.analysis.count }}
+    successCondition: result > {{ .Values.analysis.traffic.min }}
+    failureCondition: result <= {{ .Values.analysis.traffic.min }}
+    provider:
+      prometheus:
+        address: {{ .Values.analysis.prometheus.address }}
+        query: |
+          sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m]))
+
+
   # ----------------------------------
-  # ✅ ERROR RATE (5xx errors)
+  # ✅ ERROR RATE (5xx errors) # 🔹 Error Rate
   # ----------------------------------
   - name: error-rate
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: result < {{ .Values.analysis.errorRateThreshold }}
-    failureCondition: result >= {{ .Values.analysis.errorRateThreshold }}
-    consecutiveErrorLimit: 4
+    successCondition: result < {{ .Values.analysis.error.RateThreshold }}
+    failureCondition: result >= {{ .Values.analysis.error.RateThreshold }}
+    consecutiveErrorLimit: {{ .Values.analysis.error.consecutiveLimit }}
     provider:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
         query: |
           scalar(
-            sum(rate(http_requests_total{status=~"5.."}[1m])) 
+            sum(rate(http_requests_total{status=~"5..", job="{{`{{args.jobName}}`}}"}[1m])) 
             /
-            sum(rate(http_requests_total[1m]))
+            sum(rate(http_requests_total{job="{{`{{args.service-name}}`}}"}[1m]))
           )
+          
 
   # ----------------------------------
-  # ✅ SUCCESS RATE
+  # ✅ SUCCESS RATE - # 🔹 Success Rate
   # ----------------------------------
   - name: success-rate
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: result > {{ .Values.analysis.successRateThreshold }}
-    failureCondition: result <= {{ .Values.analysis.successRateThreshold }}
-    consecutiveErrorLimit: 4
+    successCondition: result > {{ .Values.analysis.success.RateThreshold }}
+    failureCondition: result <= {{ .Values.analysis.success.RateThreshold }}    
     provider:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
         query: |
           scalar(
-            sum(rate(http_requests_total{status!~"5.."}[1m]))
+            sum(rate(http_requests_total{status!~"5..", job="{{`{{args.jobName}}`}}"}[1m]))
             /
-            sum(rate(http_requests_total[1m])) 
+            sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m]))
           )
-
+          
   # ----------------------------------
-  # ✅ LATENCY (P95)
+  # ✅ LATENCY (P95) -  # 🔹 Latency
   # ----------------------------------
   - name: latency-p95
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: result < {{ .Values.analysis.latencyThreshold }}
-    failureCondition: result >= {{ .Values.analysis.latencyThreshold }}
-    consecutiveErrorLimit: 4
+    successCondition: result < {{ .Values.analysis.latency.Threshold }}
+    failureCondition: result >= {{ .Values.analysis.latency.Threshold }}
     provider:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
         query: |
           histogram_quantile(0.95,
-            sum(rate(http_request_duration_seconds_bucket[1m])) by (le)
-          )
+            sum(rate(http_request_duration_seconds_bucket{job="{{`{{args.jobName}}`}}"}[1m])) by (le))         
 {{- end }}

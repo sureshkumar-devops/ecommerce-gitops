@@ -38,23 +38,31 @@ livenessProbe:
   timeoutSeconds: 2
   periodSeconds: 10
   failureThreshold: 3
+
+
 analysis:
   enabled: true
-  interval: 30s
+  interval: 15s
   count: 2 # Reduced from 3 to 2 for faster Dev cycles
   # thresholds
+  traffic:
+    min: 5 # very low traffic allowed
+  
+  error:
+    RateThreshold: 0.05 # 5% allowed <5% errors
+    consecutiveLimit: 3
 
-  errorRateThreshold: 0.2 # <5% errors
-  successRateThreshold: 0.7 # >95% success
-  latencyThreshold: 1.5 # <500ms
-  #successThreshold: 0.05 # Slightly more relaxed (10%) for unstable dev traffic
-  #failureThreshold: 0.05 # Slightly more relaxed
-  #retryOnError: true
+  success:
+    RateThreshold: 0.95 # >95% success
+
+  latency:
+    Threshold: 1.0 # 1 sec allowed
+
   prometheus:
-    # Double check this internal URL exists in your Dev cluster!
     #address: http://prometheus-operated.monitoring.svc.cluster.local:9090
     address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
-    #job: my-app-dev # Usually dev jobs have a -dev suffix
+    #job: dev-my-app-job # Usually dev jobs have a -dev suffix
+
 httpRoute:
   enabled: true
   parentGatewayName: shared-gateway
