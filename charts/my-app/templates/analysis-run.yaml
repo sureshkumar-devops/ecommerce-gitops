@@ -6,11 +6,13 @@ metadata:
   namespace: {{ .Values.env }}
   annotations:
     argocd.argoproj.io/hook: PostSync
+    # 💡 This ensures only ONE run is visible in the UI at a time
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
-  analysisTemplate:
-    - name: {{ .Values.env }}-app-health-check
+  # 💡 Use 'templateName', NOT 'analysisTemplate'
+  templateName: {{ .Values.env }}-app-health-check
   args:
     - name: jobName
       value: {{ .Values.jobName | default "my-app" | quote }}
 {{- end }}
+
