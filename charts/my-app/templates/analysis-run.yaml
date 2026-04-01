@@ -7,10 +7,9 @@ metadata:
   annotations:
     argocd.argoproj.io/hook: PostSync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
-    argocd.argoproj.io/sync-wave: "1"
 spec:
-  templates:
-    - templateName: {{ .Values.env }}-app-health-check
+  analysisTemplate:
+    - name: {{ .Values.env }}-app-health-check
   args:
     - name: jobName
       value: {{ .Values.jobName | default "my-app" | quote }}
