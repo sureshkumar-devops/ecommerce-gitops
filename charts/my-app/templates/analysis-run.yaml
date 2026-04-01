@@ -1,4 +1,4 @@
-{{- if eq .Values.env "dev" }}
+{{- if and (eq .Values.env "dev") .Values.analysis.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisRun
 metadata:
@@ -11,10 +11,8 @@ metadata:
     # Optional: Deletes the old run once a new one starts to keep the UI clean
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
-{{- if .Values.analysis.enabled }}
-  templateName: dev-app-health-check
+  templateName: {{ .Values.env }}-app-health-check
   args:
     - name: jobName
       value: {{ .Values.jobName | default "my-app" | quote }}
-{{- end }}
 {{- end }}
