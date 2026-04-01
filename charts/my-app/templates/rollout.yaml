@@ -68,9 +68,9 @@ spec:
         - analysis:
           templates:
           - templateName: {{ .Values.env }}-app-health-check 
-            args:
-            - name: jobName
-              value: {{ include "my-app.jobName" . | quote }}
+          args:
+          - name: jobName
+            value: {{ include "my-app.jobName" . | quote }}
 {{- end }}
         # 🔹 STEP 2
         - setWeight: 50
@@ -79,9 +79,9 @@ spec:
         - analysis:
           templates:
           - templateName: {{ .Values.env }}-app-health-check
-            args:
-            - name: jobName
-              value: {{ include "my-app.jobName" . | quote }}
+          args:
+          - name: jobName
+            value: {{ include "my-app.jobName" . | quote }}
 {{- end }}              
         # 🔹 STEP 3 (FINAL)
         - setWeight: 100
@@ -90,9 +90,9 @@ spec:
         - analysis:
           templates:
           - templateName: {{ .Values.env }}-app-health-check
-            args:
-            - name: jobName
-              value: {{ include "my-app.jobName" . | quote }}
+          args:
+          - name: jobName
+            value: {{ include "my-app.jobName" . | quote }}
 {{- end }}
 {{- end }}
 
@@ -105,15 +105,15 @@ spec:
       prePromotionAnalysis:
         templates:
         - templateName: {{ .Values.env }}-app-health-check
-          args:
-          - name: jobName
-            value: {{ include "my-app.jobName" . | quote }}
+        args:
+        - name: jobName
+          value: {{ include "my-app.jobName" . | quote }}
       postPromotionAnalysis:
         templates:
         - templateName: {{ .Values.env }}-app-health-check
-          args:
-          - name: jobName
-            value: {{ include "my-app.jobName" . | quote }}
+        args:
+        - name: jobName
+          value: {{ include "my-app.jobName" . | quote }}
 {{- end }}
 {{- end }}
 {{- end }}
