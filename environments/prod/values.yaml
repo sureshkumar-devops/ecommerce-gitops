@@ -53,10 +53,8 @@ analysis:
     consecutiveLimit: 2
   success:
     threshold: 0.99
-  
   latency:
-    threshold: 0.3  # 300ms
-
+    threshold: 0.3 # 300ms
   prometheus:
     #address: http://prometheus-operated.monitoring.svc.cluster.local:9090
     address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
