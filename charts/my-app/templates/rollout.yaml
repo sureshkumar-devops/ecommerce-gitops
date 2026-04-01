@@ -14,7 +14,7 @@ metadata:
     notifications.argoproj.io/subscribe.on-rollout-completed.slack: devops-alerts 
 spec:
   replicas: {{ .Values.replicaCount | default 2 }}
-  revisionHistoryLimit: 3
+  revisionHistoryLimit: 2
 
   # 🔥 Add stability controls
   progressDeadlineSeconds: 300
@@ -113,7 +113,8 @@ spec:
     blueGreen:
       activeService: {{ .Values.service.name }}
       previewService: {{ .Values.service.previewName }}
-      autoPromotionEnabled: false
+      # 💡 Change this to true to automate the rollout
+      autoPromotionEnabled: true
 
 {{- if .Values.analysis.enabled }}
 
