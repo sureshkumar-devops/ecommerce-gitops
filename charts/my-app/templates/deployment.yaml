@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "my-app.fullname" . }}  
+  namespace: {{ .Values.env }}
   labels:
     app.kubernetes.io/managed-by: helm
     app.kubernetes.io/part-of: ecommerce
@@ -10,7 +11,7 @@ metadata:
     environment: {{ .Values.env }}
     gitops.branch: {{ .Values.gitopsBranch }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.replicaCount  | default 1 }}
   selector:
     matchLabels:        
       app.kubernetes.io/name: {{ .Chart.Name }}
@@ -24,10 +25,11 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
           ports:
-            - name: http-deploy
-              containerPort: {{ .Values.containerPort }}
+            - name: {{ .Values.monitoring.portName | default "metrics" }}
+              containerPort: {{ .Values.service.targetPort | default 3000 }}
+
           readinessProbe:
             httpGet:
               path: {{ .Values.probePath }}
@@ -36,6 +38,7 @@ spec:
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default 2 }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds | default 10 }}
             failureThreshold: {{ .Values.readinessProbe.failureThreshold | default 3 }}
+
           livenessProbe:
             httpGet:
               path: {{ .Values.probePath }}

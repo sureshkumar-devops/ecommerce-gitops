@@ -56,7 +56,7 @@ analysis:
     address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
     #job: my-app-dev # Usually dev jobs have a -dev suffix
 httpRoute:
-  enabled: false
+  enabled: true
   parentGatewayName: shared-gateway
   parentGatewayNamespace: nginx-gateway
   parentGatewaySectionName: http-dev
@@ -67,7 +67,7 @@ features:
   ExperimentTrafficRouting: true
 # --- ServiceMonitor in prod for stable, service‑based scraping ---
 monitoring:
-  enabled: false
+  enabled: false 
   type: servicemonitor
   prometheusRelease: prometheus
   portName: metrics
