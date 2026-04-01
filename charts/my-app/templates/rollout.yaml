@@ -72,7 +72,7 @@ spec:
       steps:
         # 🔹 STEP 1
         - setWeight: 20
-        - pause: { duration: 30s }   # ✅ ADD THIS
+        - pause: { duration: 1m }   # ✅ ADD THIS
 
 {{- if .Values.analysis.enabled }}
         - analysis:
@@ -85,7 +85,7 @@ spec:
 {{- end }}
         # 🔹 STEP 2
         - setWeight: 50
-        - pause: { duration: 30s }
+        - pause: { duration: 1m }
 
 {{- if .Values.analysis.enabled }}        
         - analysis:
@@ -98,7 +98,7 @@ spec:
 {{- end }}              
         # 🔹 STEP 3 (FINAL)
         - setWeight: 100
-        - pause: { duration: 30s }
+        - pause: { duration: 2m }
 {{- if .Values.analysis.enabled }}
         - analysis:
           templates:
