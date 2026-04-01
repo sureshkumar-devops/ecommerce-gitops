@@ -34,8 +34,7 @@ spec:
           port: {{ .Values.service.port }}
           weight: 100
         
-        # Canary/Preview Backend (Only for Staging and Prod)  
-        #{{- if .Values.service.previewName }}
+        # Canary/Preview Backend (Only for Staging and Prod)
         {{- if (or (eq .Values.env "staging") (eq .Values.env "prod")) }}
         - name: {{ include "my-app.serviceNamePreview" . }}
           port: {{ .Values.service.port }}
