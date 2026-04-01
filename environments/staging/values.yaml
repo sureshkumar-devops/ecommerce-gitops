@@ -45,20 +45,15 @@ analysis:
   enabled: true
   interval: 30s
   count: 3
-
   traffic:
     min: 10
-   
   error:
     RateThreshold: 0.02
     consecutiveLimit: 2
- 
   success:
     RateThreshold: 0.98
-
   latency:
     Threshold: 0.5
-
   prometheus:
     #address: http://prometheus-operated.monitoring.svc.cluster.local:9090
     address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
