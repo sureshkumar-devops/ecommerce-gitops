@@ -9,7 +9,7 @@ metadata:
     # 💡 This tells Argo CD to run this AFTER the deployment syncs
     argocd.argoproj.io/hook: PostSync
     # Optional: Deletes the old run once a new one starts to keep the UI clean
-    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
 {{- if .Values.analysis.enabled }}
   templateName: dev-app-health-check

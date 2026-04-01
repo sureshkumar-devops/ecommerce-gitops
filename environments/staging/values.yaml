@@ -48,10 +48,10 @@ analysis:
   traffic:
     min: 10
   error:
-    RateThreshold: 0.02
+    threshold: 0.02
     consecutiveLimit: 2
   success:
-    RateThreshold: 0.98
+    threshold: 0.98
   latency:
     Threshold: 0.5
   prometheus:

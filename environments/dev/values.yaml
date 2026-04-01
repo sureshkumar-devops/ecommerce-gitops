@@ -46,10 +46,10 @@ analysis:
   traffic:
     min: 5 # very low traffic allowed
   error:
-    RateThreshold: 0.05 # 5% allowed <5% errors
+    threshold: 0.05 # 5% allowed <5% errors
     consecutiveLimit: 3
   success:
-    RateThreshold: 0.95 # >95% success
+    threshold: 0.95 # >95% success
   latency:
     Threshold: 1.0 # 1 sec allowed
   prometheus:

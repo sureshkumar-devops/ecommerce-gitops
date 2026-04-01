@@ -29,8 +29,8 @@ spec:
   - name: error-rate
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: result < {{ .Values.analysis.error.RateThreshold }}
-    failureCondition: result >= {{ .Values.analysis.error.RateThreshold }}
+    successCondition: result < {{ .Values.analysis.error.threshold }}
+    failureCondition: result >= {{ .Values.analysis.error.threshold }}
     consecutiveErrorLimit: {{ .Values.analysis.error.consecutiveLimit }}
     provider:
       prometheus:
@@ -49,8 +49,8 @@ spec:
   - name: success-rate
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: result > {{ .Values.analysis.success.RateThreshold }}
-    failureCondition: result <= {{ .Values.analysis.success.RateThreshold }}    
+    successCondition: result > {{ .Values.analysis.success.threshold }}
+    failureCondition: result <= {{ .Values.analysis.success.threshold }}    
     provider:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
@@ -67,8 +67,8 @@ spec:
   - name: latency-p95
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: result < {{ .Values.analysis.latency.Threshold }}
-    failureCondition: result >= {{ .Values.analysis.latency.Threshold }}
+    successCondition: result < {{ .Values.analysis.latency.threshold }}
+    failureCondition: result >= {{ .Values.analysis.latency.threshold }}
     provider:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
