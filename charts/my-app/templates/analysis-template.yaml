@@ -4,6 +4,8 @@ kind: AnalysisTemplate
 metadata:
   name: {{ .Values.env }}-app-health-check
   namespace: {{ .Values.env }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   args:
     - name: jobName
@@ -29,17 +31,17 @@ spec:
   - name: error-rate
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: result < {{ .Values.analysis.error.RateThreshold }}
-    failureCondition: result >= {{ .Values.analysis.error.RateThreshold }}
+    successCondition: result < {{ .Values.analysis.error.threshold }}
+    failureCondition: result >= {{ .Values.analysis.error.threshold }}
     consecutiveErrorLimit: {{ .Values.analysis.error.consecutiveLimit }}
     provider:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
         query: |
           scalar(
-            sum(rate(http_requests_total{status=~"5..", job="{{`{{args.jobName}}`}}"}[1m])) 
+            (sum(rate(http_requests_total{status=~"5..",job="{{`{{args.jobName}}`}}"}[1m])) or vector(0))
             /
-            sum(rate(http_requests_total{job="{{`{{args.service-name}}`}}"}[1m]))
+            (sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m])) or vector(1))
           )
           
 
@@ -49,16 +51,16 @@ spec:
   - name: success-rate
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: result > {{ .Values.analysis.success.RateThreshold }}
-    failureCondition: result <= {{ .Values.analysis.success.RateThreshold }}    
+    successCondition: result > {{ .Values.analysis.success.threshold }}
+    failureCondition: result <= {{ .Values.analysis.success.threshold }}    
     provider:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
         query: |
           scalar(
-            sum(rate(http_requests_total{status!~"5..", job="{{`{{args.jobName}}`}}"}[1m]))
+            (sum(rate(http_requests_total{status!~"5..", job="{{`{{args.jobName}}`}}"}[1m])) or vector(0))
             /
-            sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m]))
+            (sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m])) or vector(1))
           )
           
   # ----------------------------------
@@ -67,8 +69,8 @@ spec:
   - name: latency-p95
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: result < {{ .Values.analysis.latency.Threshold }}
-    failureCondition: result >= {{ .Values.analysis.latency.Threshold }}
+    successCondition: result < {{ .Values.analysis.latency.threshold }}
+    failureCondition: result >= {{ .Values.analysis.latency.threshold }}
     provider:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
