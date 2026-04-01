@@ -46,24 +46,18 @@ analysis:
   enabled: true
   interval: 30s
   count: 5
-
   traffic:
     min: 20
-
   error:
     RateThreshold: 0.01 # 1% max
-    consecutiveLimit: 2 
-
+    consecutiveLimit: 2
   success:
     RateThreshold: 0.99
-
   latency:
-    Threshold: 0.3  # 300ms
-
+    Threshold: 0.3 # 300ms
   prometheus:
     #address: http://prometheus-operated.monitoring.svc.cluster.local:9090
     address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
-    
 # --- Gateway API Configuration --
 httpRoute:
   enabled: true
