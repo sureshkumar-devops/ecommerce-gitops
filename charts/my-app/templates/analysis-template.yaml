@@ -37,9 +37,9 @@ spec:
         address: {{ .Values.analysis.prometheus.address }}
         query: |
           scalar(
-            sum(rate(http_requests_total{status=~"5..", job="{{`{{args.jobName}}`}}"}[1m])) 
+            sum(rate(http_requests_total{status=~"5..",job="{{`{{args.jobName}}`}}"}[1m])) 
             /
-            sum(rate(http_requests_total{job="{{`{{args.service-name}}`}}"}[1m]))
+            sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m]))
           )
           
 
