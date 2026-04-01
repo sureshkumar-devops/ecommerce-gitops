@@ -53,27 +53,17 @@ spec:
 {{- if eq .Values.deploymentStrategy "canary" }}
     canary:
       abortScaleDownDelaySeconds: 30  # cleanup failed canary
-
       canaryService: {{ .Values.service.previewName }}
       stableService: {{ .Values.service.name }}
-
       trafficRouting:
        plugins:
          argoproj-labs/gatewayAPI:
            httpRoute: {{ .Values.env }}-my-app-httproute
-           namespace: {{ .Values.env }}
-      
-      # 🔥 retain analysis history
-      #analysis:
-      #  successfulRunHistoryLimit: 5
-      #  unsuccessfulRunHistoryLimit: 5       
-
-            
+           namespace: {{ .Values.env }}       
       steps:
         # 🔹 STEP 1
         - setWeight: 20
-        - pause: { duration: 1m }   # ✅ ADD THIS
-
+        - pause: { duration: 1m } 
 {{- if .Values.analysis.enabled }}
         - analysis:
           templates:
@@ -85,7 +75,6 @@ spec:
         # 🔹 STEP 2
         - setWeight: 50
         - pause: { duration: 1m }
-
 {{- if .Values.analysis.enabled }}        
         - analysis:
           templates:
@@ -111,24 +100,20 @@ spec:
     blueGreen:
       activeService: {{ .Values.service.name }}
       previewService: {{ .Values.service.previewName }}
-      # 💡 Change this to true to automate the rollout
       autoPromotionEnabled: true
-
 {{- if .Values.analysis.enabled }}
-
       prePromotionAnalysis:
         templates:
         - templateName: {{ .Values.env }}-app-health-check
-        args:
-        - name: jobName
-          value: {{ include "my-app.jobName" . | quote }}
-
+          args:
+          - name: jobName
+            value: {{ include "my-app.jobName" . | quote }}
       postPromotionAnalysis:
         templates:
         - templateName: {{ .Values.env }}-app-health-check
-        args:
-        - name: jobName
-          value: {{ include "my-app.jobName" . | quote }}
+          args:
+          - name: jobName
+            value: {{ include "my-app.jobName" . | quote }}
 {{- end }}
 {{- end }}
 {{- end }}
