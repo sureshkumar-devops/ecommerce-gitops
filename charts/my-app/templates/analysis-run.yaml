@@ -2,17 +2,18 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisRun
 metadata:
-  # Using generateName requires a Hook annotation for Argo CD to work
+  # generateName works here because of the 'Sync' hook annotation below
   generateName: dev-health-check-run-
   namespace: {{ .Values.env }}
   annotations:
-    # This tells Argo CD to use 'create' instead of 'apply'
-    argocd.argoproj.io/hook: Sync 
-    # Optional: Automatically delete the old run before starting a new one
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation 
+    # Forces Argo CD to use 'kubectl create' instead of 'apply'
+    argocd.argoproj.io/hook: Sync
+    # Ensures old failed/successful runs are cleaned up before a new one starts
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
-  analysisTemplate:
-    name: {{ .Values.env }}-app-health-check
+  # Corrected: Use 'templates' as a list to pull metrics from your AnalysisTemplate
+  templates:
+    - templateName: {{ .Values.env }}-app-health-check
   arguments:
     - name: jobName
       value: {{ .Values.jobName | default "my-app" | quote }}
