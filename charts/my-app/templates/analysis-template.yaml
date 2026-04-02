@@ -4,14 +4,10 @@ kind: AnalysisTemplate
 metadata:
   name: {{ .Values.env }}-app-health-check
   namespace: {{ .Values.env }}
-  annotations:
-    argocd.argoproj.io/sync-wave: "0"
 spec:
   args:
     - name: jobName
-
   metrics:
-
   # 🔹 Traffic Gate
   - name: traffic-volume
     interval: {{ .Values.analysis.interval }}
@@ -23,8 +19,6 @@ spec:
         address: {{ .Values.analysis.prometheus.address }}
         query: |
           sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m]))
-
-
   # ----------------------------------
   # ✅ ERROR RATE (5xx errors) # 🔹 Error Rate
   # ----------------------------------
@@ -43,8 +37,6 @@ spec:
             /
             (sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m])) or vector(1))
           )
-          
-
   # ----------------------------------
   # ✅ SUCCESS RATE - # 🔹 Success Rate
   # ----------------------------------
@@ -61,8 +53,7 @@ spec:
             (sum(rate(http_requests_total{status!~"5..", job="{{`{{args.jobName}}`}}"}[1m])) or vector(0))
             /
             (sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m])) or vector(1))
-          )
-          
+          )         
   # ----------------------------------
   # ✅ LATENCY (P95) -  # 🔹 Latency
   # ----------------------------------
