@@ -2,17 +2,13 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisRun
 metadata:
-  generateName: {{ include "my-app.fullname" . }}-health-check-
+  generateName: {{ .Values.env }}-health-check
   namespace: {{ .Values.env }}
-  annotations:
-    argocd.argoproj.io/hook: PostSync
-    # 💡 This ensures only ONE run is visible in the UI at a time
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
-  # 💡 Use 'templateName', NOT 'analysisTemplate'
-  templateName: {{ .Values.env }}-app-health-check
-  args:
-    - name: jobName
-      value: {{ .Values.jobName | default "my-app" | quote }}
+ analysisTemplate:
+   name: {{ .Values.env }}-app-health-check
+ arguments:
+   - name: jobName
+     value: {{ .Values.jobName | default "my-app" | quote }}
 {{- end }}
 
