@@ -2,13 +2,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisRun
 metadata:
-  # 1. generateName ensures every sync gets a unique run (e.g., run-abc12)
   generateName: dev-health-check-run-
   namespace: {{ .Values.env }}
   annotations:
-    # 2. Sync hook tells Argo CD to 'create' instead of 'apply'
     argocd.argoproj.io/hook: Sync
-    # 3. Cleans up the previous run before starting the new one
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
   args:
@@ -24,8 +21,9 @@ spec:
     provider:
       prometheus:
         address: http://cluster.local
+        # Use backticks to escape Argo variables from Helm
         query: |
-          sum(rate(http_requests_total{job="{{args.jobName}}"}[1m]))
+          sum(rate(http_requests_total{job="{{ `{{` }}args.jobName{{ `}}` }}"}[1m]))
   
   - name: error-rate
     interval: 15s
@@ -38,9 +36,9 @@ spec:
         address: http://cluster.local
         query: |
           scalar(
-            (sum(rate(http_requests_total{status=~"5..",job="{{args.jobName}}"}[1m])) or vector(0))
+            (sum(rate(http_requests_total{status=~"5..",job="{{ `{{` }}args.jobName{{ `}}` }}"}[1m])) or vector(0))
             /
-            (sum(rate(http_requests_total{job="{{args.jobName}}"}[1m])) or vector(1))
+            (sum(rate(http_requests_total{job="{{ `{{` }}args.jobName{{ `}}` }}"}[1m])) or vector(1))
           )
 
   - name: success-rate
@@ -53,9 +51,11 @@ spec:
         address: http://cluster.local
         query: |
           scalar(
-            (sum(rate(http_requests_total{status!~"5..", job="{{args.jobName}}"}[1m])) or vector(0))
+            (sum(rate(http_requests_total{status!~"5..", job="{{ `{{` }}args.jobName{{ `}}` }}"}[1m]))
+              or vector(0))
             /
-            (sum(rate(http_requests_total{job="{{args.jobName}}"}[1m])) or vector(1))
+            (sum(rate(http_requests_total{job="{{ `{{` }}args.jobName{{ `}}` }}"}[1m]))
+              or vector(1))
           )
 
   - name: latency-p95
@@ -68,6 +68,6 @@ spec:
         address: http://cluster.local
         query: |
           histogram_quantile(0.95,
-            sum(rate(http_request_duration_seconds_bucket{job="{{args.jobName}}"}[1m])) by (le))
+            sum(rate(http_request_duration_seconds_bucket{job="{{ `{{` }}args.jobName{{ `}}` }}"}[1m])) by (le))
 {{- end }}
 
