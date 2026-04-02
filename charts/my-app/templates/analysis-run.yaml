@@ -1,8 +1,10 @@
 {{- if and (eq .Values.env "dev") .Values.analysis.enabled }}
+# Define variables to escape Argo braces from Helm
+{{- $open := "{{" -}}
+{{- $close := "}}" -}}
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisRun
 metadata:
-  # Using generateName + Sync Hook ensures Argo CD can create new runs reliably
   generateName: dev-health-check-run-
   namespace: {{ .Values.env }}
   annotations:
@@ -14,7 +16,6 @@ spec:
     value: {{ .Values.jobName | default "my-app" | quote }}
 
   metrics:
-  # 🔹 Traffic Gate
   - name: traffic-volume
     interval: 15s
     count: 2
@@ -24,9 +25,8 @@ spec:
       prometheus:
         address: http://cluster.local
         query: |
-          sum(rate(http_requests_total{job="{{ `{{` }}args.jobName{{ `}}` }}"}[1m]))
+          sum(rate(http_requests_total{job="{{ $open }}args.jobName{{ $close }}"}[1m]))
   
-  # 🔹 Error Rate
   - name: error-rate
     interval: 15s
     count: 2
@@ -38,12 +38,11 @@ spec:
         address: http://cluster.local
         query: |
           scalar(
-            (sum(rate(http_requests_total{status=~"5..",job="{{ `{{` }}args.jobName{{ `}}` }}"}[1m])) or vector(0))
+            (sum(rate(http_requests_total{status=~"5..",job="{{ $open }}args.jobName{{ $close }}"}[1m])) or vector(0))
             /
-            (sum(rate(http_requests_total{job="{{ `{{` }}args.jobName{{ `}}` }}"}[1m])) or vector(1))
+            (sum(rate(http_requests_total{job="{{ $open }}args.jobName{{ $close }}"}[1m])) or vector(1))
           )
 
-  # 🔹 Success Rate
   - name: success-rate
     interval: 15s
     count: 2
@@ -54,12 +53,11 @@ spec:
         address: http://cluster.local
         query: |
           scalar(
-            (sum(rate(http_requests_total{status!~"5..", job="{{ `{{` }}args.jobName{{ `}}` }}"}[1m])) or vector(0))
+            (sum(rate(http_requests_total{status!~"5..", job="{{ $open }}args.jobName{{ $close }}"}[1m])) or vector(0))
             /
-            (sum(rate(http_requests_total{job="{{ `{{` }}args.jobName{{ `}}` }}"}[1m])) or vector(1))
+            (sum(rate(http_requests_total{job="{{ $open }}args.jobName{{ $close }}"}[1m])) or vector(1))
           )
 
-  # 🔹 Latency
   - name: latency-p95
     interval: 15s
     count: 2
@@ -70,6 +68,6 @@ spec:
         address: http://cluster.local
         query: |
           histogram_quantile(0.95,
-            sum(rate(http_request_duration_seconds_bucket{job="{{ `{{` }}args.jobName{{ `}}` }}"}[1m])) by (le))
+            sum(rate(http_request_duration_seconds_bucket{job="{{ $open }}args.jobName{{ $close }}"}[1m])) by (le))
 {{- end }}
 
