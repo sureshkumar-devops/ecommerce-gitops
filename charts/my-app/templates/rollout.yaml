@@ -5,18 +5,15 @@ metadata:
   name: {{ include "my-app.fullname" . }}
   namespace: {{ .Values.env }}
   labels:
-    app.kubernetes.io/name: {{ .Chart.Name }}
-    environment: {{ .Values.env }}
+    {{- include "my-app.labels" . | nindent 4 }}
   annotations:
     notifications.argoproj.io/subscribe.on-analysis-failed.slack: devops-alerts
     notifications.argoproj.io/subscribe.on-rollout-aborted.slack: devops-alerts
     notifications.argoproj.io/subscribe.on-rollout-success.slack: devops-alerts
     notifications.argoproj.io/subscribe.on-rollout-completed.slack: devops-alerts
-
 spec:
   replicas: {{ .Values.replicaCount | default 2 }}
   revisionHistoryLimit: 2
-
   progressDeadlineSeconds: 300
   abortScaleDownDelaySeconds: 30
 
@@ -24,51 +21,20 @@ spec:
     matchLabels:
       {{- include "my-app.selectorLabels" . | nindent 6 }}
 
-  template:
-    metadata:
-      labels:
-        {{- include "my-app.selectorLabels" . | nindent 8 }}
-    spec:
-      containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
-
-          ports:
-            - name: {{ .Values.monitoring.portName | default "metrics" }}
-              containerPort: {{ .Values.service.targetPort | default 3000 }}
-
-          readinessProbe:
-            httpGet:
-              path: {{ .Values.probePath | default "/" }}
-              port: {{ .Values.containerPort | default 3000 }}
-            initialDelaySeconds: 10
-
-          livenessProbe:
-            httpGet:
-              path: {{ .Values.probePath | default "/" }}
-              port: {{ .Values.containerPort | default 3000 }}
-            initialDelaySeconds: 20
-
+  # --- STRATEGY BLOCK ---
   strategy:
-
 {{- if eq .Values.deploymentStrategy "canary" }}
     canary:
-      abortScaleDownDelaySeconds: 30
-      canaryService: {{ .Values.service.previewName }}
-      stableService: {{ .Values.service.name }}
-
+      canaryService: {{ include "my-app.serviceNamePreview" . }}
+      stableService: {{ include "my-app.serviceNameActive" . }}
       trafficRouting:
         plugins:
           argoproj-labs/gatewayAPI:
             httpRoute: {{ .Values.env }}-my-app-httproute
             namespace: {{ .Values.env }}
-
       steps:
-        # 🔹 STEP 1
         - setWeight: 20
-        - pause:
-            duration: 1m
+        - pause: { duration: 1m }
 {{- if .Values.analysis.enabled }}
         - analysis:
             templates:
@@ -77,11 +43,8 @@ spec:
               - name: jobName
                 value: {{ include "my-app.jobName" . | quote }}
 {{- end }}
-
-        # 🔹 STEP 2
         - setWeight: 50
-        - pause:
-            duration: 1m
+        - pause: { duration: 1m }
 {{- if .Values.analysis.enabled }}
         - analysis:
             templates:
@@ -90,27 +53,14 @@ spec:
               - name: jobName
                 value: {{ include "my-app.jobName" . | quote }}
 {{- end }}
-
-        # 🔹 STEP 3
         - setWeight: 100
-        - pause:
-            duration: 2m
-{{- if .Values.analysis.enabled }}
-        - analysis:
-            templates:
-              - templateName: {{ .Values.env }}-app-health-check
-            args:
-              - name: jobName
-                value: {{ include "my-app.jobName" . | quote }}
-{{- end }}
 {{- end }}
 
 {{- if eq .Values.deploymentStrategy "bluegreen" }}
     blueGreen:
-      activeService: {{ .Values.service.name }}
-      previewService: {{ .Values.service.previewName }}
+      activeService: {{ include "my-app.serviceNameActive" . }}
+      previewService: {{ include "my-app.serviceNamePreview" . }}
       autoPromotionEnabled: true
-
 {{- if .Values.analysis.enabled }}
       prePromotionAnalysis:
         templates:
@@ -118,7 +68,6 @@ spec:
         args:
           - name: jobName
             value: {{ include "my-app.jobName" . | quote }}
-
       postPromotionAnalysis:
         templates:
           - templateName: {{ .Values.env }}-app-health-check
@@ -128,4 +77,28 @@ spec:
 {{- end }}
 {{- end }}
 
+  # --- POD TEMPLATE ---
+  template:
+    metadata:
+      labels:
+        {{- include "my-app.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
+          ports:
+            - name: {{ .Values.monitoring.portName | default "metrics" }}
+              containerPort: {{ .Values.service.targetPort | default 3000 }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probePath | default "/" }}
+              port: {{ .Values.containerPort | default 3000 }}
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probePath | default "/" }}
+              port: {{ .Values.containerPort | default 3000 }}
+            initialDelaySeconds: 20
 {{- end }}
+
