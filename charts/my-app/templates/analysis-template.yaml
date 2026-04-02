@@ -44,7 +44,7 @@ spec:
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
     successCondition: result > {{ .Values.analysis.success.threshold }} || result == 0
-    failureCondition: result <= {{ .Values.analysis.success.threshold }}    
+    failureCondition: result <= {{ .Values.analysis.success.threshold }}  && result != 0  
     provider:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
