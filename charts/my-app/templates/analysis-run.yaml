@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisRun
 metadata:
-  generateName: {{ .Values.env }}-health-check
+  generateName: {{ .Values.env }}-health-check-
   namespace: {{ .Values.env }}
 spec:
  analysisTemplate:
