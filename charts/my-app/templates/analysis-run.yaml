@@ -2,6 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisRun
 metadata:
+  name: dev-health-check-run
   namespace: {{ .Values.env }}
 spec:
  analysisTemplate:
