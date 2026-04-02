@@ -1,73 +1,21 @@
 {{- if and (eq .Values.env "dev") .Values.analysis.enabled }}
-# Define variables to escape Argo braces from Helm
-{{- $open := "{{" -}}
-{{- $close := "}}" -}}
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisRun
 metadata:
-  generateName: dev-health-check-run-
+  # Using generateName ensures every sync creates a unique run
+  generateName: {{ .Values.env }}-health-check-run-
   namespace: {{ .Values.env }}
   annotations:
+    # Sync hook tells Argo CD to 'create' instead of 'apply'
     argocd.argoproj.io/hook: Sync
+    # Cleans up the previous run before starting the new one
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
-  args:
-  - name: jobName
-    value: {{ .Values.jobName | default "my-app" | quote }}
-
-  metrics:
-  - name: traffic-volume
-    interval: 15s
-    count: 2
-    successCondition: result > 5
-    failureCondition: result <= 5
-    provider:
-      prometheus:
-        address: http://cluster.local
-        query: |
-          sum(rate(http_requests_total{job="{{ $open }}args.jobName{{ $close }}"}[1m]))
-  
-  - name: error-rate
-    interval: 15s
-    count: 2
-    successCondition: result < 0.05
-    failureCondition: result >= 0.05
-    consecutiveErrorLimit: 3
-    provider:
-      prometheus:
-        address: http://cluster.local
-        query: |
-          scalar(
-            (sum(rate(http_requests_total{status=~"5..",job="{{ $open }}args.jobName{{ $close }}"}[1m])) or vector(0))
-            /
-            (sum(rate(http_requests_total{job="{{ $open }}args.jobName{{ $close }}"}[1m])) or vector(1))
-          )
-
-  - name: success-rate
-    interval: 15s
-    count: 2
-    successCondition: result > 0.95
-    failureCondition: result <= 0.95
-    provider:
-      prometheus:
-        address: http://cluster.local
-        query: |
-          scalar(
-            (sum(rate(http_requests_total{status!~"5..", job="{{ $open }}args.jobName{{ $close }}"}[1m])) or vector(0))
-            /
-            (sum(rate(http_requests_total{job="{{ $open }}args.jobName{{ $close }}"}[1m])) or vector(1))
-          )
-
-  - name: latency-p95
-    interval: 15s
-    count: 2
-    successCondition: result < 0.5
-    failureCondition: result >= 0.5
-    provider:
-      prometheus:
-        address: http://cluster.local
-        query: |
-          histogram_quantile(0.95,
-            sum(rate(http_request_duration_seconds_bucket{job="{{ $open }}args.jobName{{ $close }}"}[1m])) by (le))
+  # This links directly to the AnalysisTemplate you provided
+  templates:
+    - templateName: {{ .Values.env }}-app-health-check
+  arguments:
+    - name: jobName
+      value: {{ .Values.jobName | default "my-app" | quote }}
 {{- end }}
 
