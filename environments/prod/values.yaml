@@ -7,7 +7,7 @@ replicaCount: 3
 deploymentStrategy: bluegreen
 image:
   repository: lehardocker/ecommerce-app
-  tag: "v2026.04.03-3c12982"
+  tag: "v2026.04.03-20a9f61"
   pullPolicy: Always
 # --- Service Configuration ---
 service:
@@ -81,7 +81,7 @@ rollout:
   enabled: true
 hpa:
   enabled: true
-  minReplicas: 5  # Production usually starts higher
+  minReplicas: 5 # Production usually starts higher
   maxReplicas: 20
   targetCPUUtilizationPercentage: 70
   targetMemoryUtilizationPercentage: 70
