@@ -19,7 +19,7 @@ service:
 containerPort: 3000 # matches app inside container
 # --- Probe Settings ---
 # ✅ health check
-probePath: /health
+probePath: /
 readinessProbe:
   initialDelaySeconds: 5
   timeoutSeconds: 2
