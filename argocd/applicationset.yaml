@@ -35,6 +35,14 @@ spec:
       kind: HTTPRoute
       jsonPointers:
         - /spec/rules/0/backendRefs
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+    - group: argoproj.io
+      kind: Rollout
+      jsonPointers:
+        - /spec/replicas
 
     project: default
     source:
@@ -57,6 +65,8 @@ spec:
        prune: true
      syncOptions:
      -  CreateNamespace=true
+     -  RespectIgnoreDifferences=true
+
 
 
 

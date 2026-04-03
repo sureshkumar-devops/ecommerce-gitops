@@ -33,11 +33,15 @@ spec:
         - name: {{ include "my-app.serviceNameActive" . }}
           port: {{ .Values.service.port }}
           weight: 100
-        
-        # Canary/Preview Backend (Only for Staging and Prod)
-        {{- if (or (eq .Values.env "staging") (eq .Values.env "prod")) }}
+
+        # Conditional Secondary Backend
+        {{- if eq .Values.deploymentStrategy "canary" }}
+        - name: {{ include "my-app.serviceNameCanary" . }}
+          port: {{ .Values.service.port }}
+          weight: 0
+        {{- else if eq .Values.deploymentStrategy "bluegreen" }}
         - name: {{ include "my-app.serviceNamePreview" . }}
           port: {{ .Values.service.port }}
           weight: 0
-        {{- end }}
+        {{- end }}    
 {{- end }}

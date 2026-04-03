@@ -115,6 +115,7 @@ ingress:
 rollout:
   enabled: true
 
-autoscaling:
-  enabled: false
-
+hpa:
+  enabled: false  # Default to off
+  minReplicas: 2
+  maxReplicas: 5
