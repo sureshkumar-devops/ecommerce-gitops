@@ -7,7 +7,7 @@ replicaCount: 2
 deploymentStrategy: canary
 image:
   repository: lehardocker/ecommerce-app
-  tag: "stag-3c12982"
+  tag: "stag-20a9f61"
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
@@ -81,7 +81,7 @@ rollout:
   enabled: true
 hpa:
   enabled: true
-  minReplicas: 3 
+  minReplicas: 3
   maxReplicas: 10
   targetCPUUtilizationPercentage: 60
   targetMemoryUtilizationPercentage: 60
