@@ -81,6 +81,11 @@ Create the name of the service account to use
 {{ .Values.env }}-{{ include "my-app.name" . }}-svc-preview
 {{- end }}
 
+{{/* Service name for canary deployment */}}
+{{- define "my-app.serviceNameCanary" -}}
+{{ .Values.env }}-{{ include "my-app.name" . }}-svc-canary
+{{- end }}
+
 
 
 

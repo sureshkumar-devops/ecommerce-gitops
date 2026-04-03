@@ -6,7 +6,7 @@ replicaCount: 1
 deploymentStrategy: deployment
 image:
   repository: lehardocker/ecommerce-app
-  tag: "dev-016cf8a" # Image Updater will replace this with dev-<sha>
+  tag: "dev-3c12982" # Image Updater will replace this with dev-<sha>
   pullPolicy: Always
 # --- Service Configuration ---  
 service:
@@ -76,3 +76,9 @@ monitoring:
   path: /metrics
 rollout:
   enabled: false # no Rollout, just Deployment
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 50
+  targetMemoryUtilizationPercentage: 50

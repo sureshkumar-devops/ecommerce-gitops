@@ -25,7 +25,7 @@ spec:
 {{- if eq .Values.deploymentStrategy "canary" }}
     canary:
       abortScaleDownDelaySeconds: 30
-      canaryService: {{ include "my-app.serviceNamePreview" . }}
+      canaryService: {{ include "my-app.serviceNameCanary" . }}
       stableService: {{ include "my-app.serviceNameActive" . }}
       trafficRouting:
         plugins:
