@@ -20,12 +20,13 @@ spec:
 
 ---
 
-# 2. THE PREVIEW / CANARY SERVICE (Staging/Prod only)
-{{- if and .Values.service.enabled (or (eq .Values.env "staging") (eq .Values.env "prod")) }}
+# 2. THE SECONDARY SERVICE (Canary for Staging / Preview for Prod)
+{{- if and .Values.service.enabled (or (eq .Values.deploymentStrategy "canary") (eq .Values.deploymentStrategy "bluegreen")) }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "my-app.serviceNamePreview" . }}
+  # Logic to switch naming based on strategy
+  name: {{ if eq .Values.deploymentStrategy "canary" }}{{ include "my-app.serviceNameCanary" . }}{{ else }}{{ include "my-app.serviceNamePreview" . }}{{ end }}
   namespace: {{ .Values.env }}
   labels:
     {{- include "my-app.labels" . | nindent 4 }}
@@ -39,4 +40,5 @@ spec:
   selector:
     {{- include "my-app.selectorLabels" . | nindent 4 }}
 {{- end }}
+
 
