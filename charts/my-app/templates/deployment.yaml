@@ -12,6 +12,7 @@ metadata:
     gitops.branch: {{ .Values.gitopsBranch }}
 
 spec:
+  revisionHistoryLimit: 3
   replicas: {{ .Values.replicaCount | default 1 }}
 
   selector:
