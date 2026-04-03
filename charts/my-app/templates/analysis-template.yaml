@@ -8,7 +8,7 @@ spec:
   args:
     - name: jobName
   metrics:
-  # 🔹 Traffic Gate (Passes if > threshold OR exactly 0)
+  # 🔹 Traffic Volume
   - name: traffic-volume
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
@@ -20,11 +20,11 @@ spec:
         query: |
           scalar(sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m])) or vector(0))
 
-  # 🔹 Error Rate (Passes if < threshold OR exactly 0)
+  # 🔹 Error Rate (5xx)
   - name: error-rate
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    # FIXED: Added missing "||" operator
+    # FIXED: Added || operator here
     successCondition: result < {{ .Values.analysis.error.threshold }} || result == 0
     failureCondition: result >= {{ .Values.analysis.error.threshold }}
     consecutiveErrorLimit: {{ .Values.analysis.error.consecutiveLimit }}
@@ -38,7 +38,7 @@ spec:
             (sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m])) or vector(1))
           )
 
-  # 🔹 Success Rate (Passes if > threshold OR exactly 0)
+  # 🔹 Success Rate
   - name: success-rate
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
@@ -54,7 +54,7 @@ spec:
             (sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m])) or vector(1))
           )
 
-  # 🔹 Latency (Passes if < threshold OR exactly 0)
+  # 🔹 Latency (P95)
   - name: latency-p95
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
