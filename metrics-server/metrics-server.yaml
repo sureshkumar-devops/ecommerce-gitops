@@ -108,7 +108,7 @@ spec:
       priorityClassName: system-cluster-critical
       containers:
       - name: metrics-server
-        image: registry.k8s.io/metrics-server/metrics-server:v0.88888888.0
+        image: registry.k8s.io/metrics-server/metrics-server:v0.8.0
         imagePullPolicy: IfNotPresent
         args:
         - --cert-dir=/tmp
