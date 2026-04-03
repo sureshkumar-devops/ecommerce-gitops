@@ -18,7 +18,8 @@ spec:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
         query: |
-          sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m]))
+            scalar(sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m])) or vector(0)) 
+          #sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m]))
   # ----------------------------------
   # ✅ ERROR RATE (5xx errors) # 🔹 Error Rate
   # ----------------------------------
