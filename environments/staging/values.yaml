@@ -46,8 +46,7 @@ analysis:
   interval: 30s
   count: 3
   traffic:
-    #min: 10
-    min: 0
+    min: 10    
   error:
     threshold: 0.02
     consecutiveLimit: 2
