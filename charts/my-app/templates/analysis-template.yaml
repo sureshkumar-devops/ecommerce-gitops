@@ -12,20 +12,23 @@ spec:
   - name: traffic-volume
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: result > {{ .Values.analysis.traffic.min }}
-    failureCondition: result <= {{ .Values.analysis.traffic.min }}
+    # Pass if traffic is > 20 OR if there is absolutely no traffic (0)
+    successCondition: result > {{ .Values.analysis.traffic.min }} || result == 0
+    failureCondition: result <= {{ .Values.analysis.traffic.min }}  && result != 0
     provider:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
         query: |
-          sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m]))
+            scalar(sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m])) or vector(0)) 
+          #sum(rate(http_requests_total{job="{{`{{args.jobName}}`}}"}[1m]))
   # ----------------------------------
   # ✅ ERROR RATE (5xx errors) # 🔹 Error Rate
   # ----------------------------------
   - name: error-rate
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: result < {{ .Values.analysis.error.threshold }}
+    # 0% error rate is a success
+    successCondition: result < {{ .Values.analysis.error.threshold }} result == 0
     failureCondition: result >= {{ .Values.analysis.error.threshold }}
     consecutiveErrorLimit: {{ .Values.analysis.error.consecutiveLimit }}
     provider:
@@ -43,6 +46,7 @@ spec:
   - name: success-rate
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
+    # 0 traffic usually results in 0 here, so we mark 0 as a success
     successCondition: result > {{ .Values.analysis.success.threshold }} || result == 0
     failureCondition: result <= {{ .Values.analysis.success.threshold }}  && result != 0  
     provider:
@@ -60,12 +64,14 @@ spec:
   - name: latency-p95
     interval: {{ .Values.analysis.interval }}
     count: {{ .Values.analysis.count }}
-    successCondition: result < {{ .Values.analysis.latency.threshold }}
+    # 0ms latency (no traffic) is a success
+    successCondition: result < {{ .Values.analysis.latency.threshold }} || result == 0
     failureCondition: result >= {{ .Values.analysis.latency.threshold }}
     provider:
       prometheus:
         address: {{ .Values.analysis.prometheus.address }}
         query: |
+         scalar(
           histogram_quantile(0.95,
-            sum(rate(http_request_duration_seconds_bucket{job="{{`{{args.jobName}}`}}"}[1m])) by (le))         
+            sum(rate(http_request_duration_seconds_bucket{job="{{`{{args.jobName}}`}}"}[1m])) by (le)) or vector(0))       
 {{- end }}
