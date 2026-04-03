@@ -1,41 +1,34 @@
-# 1. THE MAIN / ACTIVE SERVICE
-# Always created for every environment (Dev, Staging, Prod)
+# 1. THE MAIN / ACTIVE SERVICE (Always created)
 {{- if .Values.service.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  #name: {{ .Values.service.name }}  # Matches 'stableService' or 'activeService'
   name: {{ include "my-app.serviceNameActive" . }}
   namespace: {{ .Values.env }}
   labels:
-    app.kubernetes.io/name: {{ .Chart.Name }}
-    environment: {{ .Values.env }}
+    {{- include "my-app.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type | default "ClusterIP" }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
       protocol: TCP
-      name: {{ .Values.monitoring.portName | default "metrics" }} 
+      name: {{ .Values.monitoring.portName | default "metrics" }}
   selector:
     {{- include "my-app.selectorLabels" . | nindent 4 }}
 {{- end }}
+
 ---
 
-# 2. THE PREVIEW / CANARY SERVICE
-# Only created if we are NOT doing a simple "deployment"
-
+# 2. THE PREVIEW / CANARY SERVICE (Staging/Prod only)
 {{- if and .Values.service.enabled (or (eq .Values.env "staging") (eq .Values.env "prod")) }}
 apiVersion: v1
 kind: Service
 metadata:
-  #name: {{ .Values.service.previewName }} # Matches 'canaryService' or 'previewService'
-  #name: {{ include "my-app.serviceNamePreview" . }}  
-  name: {{ .Values.service.previewName | default (printf "%s-preview" (include "my-app.fullname" .)) }}
+  name: {{ include "my-app.serviceNamePreview" . }}
   namespace: {{ .Values.env }}
   labels:
-    app.kubernetes.io/name: {{ .Chart.Name }}
-    environment: {{ .Values.env }}
+    {{- include "my-app.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type | default "ClusterIP" }}
   ports:
