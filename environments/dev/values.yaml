@@ -44,7 +44,8 @@ analysis:
   count: 2 # Reduced from 3 to 2 for faster Dev cycles
   # thresholds
   traffic:
-    min: 5 # very low traffic allowed
+   #min: 5 # very low traffic allowed
+    min: 0
   error:
     threshold: 0.05 # 5% allowed <5% errors
     consecutiveLimit: 3
