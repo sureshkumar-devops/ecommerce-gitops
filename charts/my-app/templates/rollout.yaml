@@ -24,6 +24,8 @@ spec:
   strategy:
 {{- if eq .Values.deploymentStrategy "canary" }}
     canary:
+      successfulJobsHistoryLimit: 2
+      failedJobsHistoryLimit: 1
       abortScaleDownDelaySeconds: 30
       canaryService: {{ include "my-app.serviceNameCanary" . }}
       stableService: {{ include "my-app.serviceNameActive" . }}
@@ -58,6 +60,8 @@ spec:
 
 {{- if eq .Values.deploymentStrategy "bluegreen" }}
     blueGreen:
+      successfulJobsHistoryLimit: 2
+      failedJobsHistoryLimit: 1
       activeService: {{ include "my-app.serviceNameActive" . }}
       previewService: {{ include "my-app.serviceNamePreview" . }}
       autoPromotionEnabled: true
