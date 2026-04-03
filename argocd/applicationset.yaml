@@ -65,7 +65,7 @@ spec:
        prune: true
      syncOptions:
      -  CreateNamespace=true
-     -  RespectIgnoreDifference=true
+     -  RespectIgnoreDifferences=true
 
 
 
