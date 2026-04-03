@@ -14,8 +14,7 @@ metadata:
 spec:
   replicas: {{ .Values.replicaCount | default 2 }}
   revisionHistoryLimit: 3
-  progressDeadlineSeconds: 300
-  abortScaleDownDelaySeconds: 30
+  progressDeadlineSeconds: 300  
 
   selector:
     matchLabels:
@@ -25,6 +24,7 @@ spec:
   strategy:
 {{- if eq .Values.deploymentStrategy "canary" }}
     canary:
+      abortScaleDownDelaySeconds: 30
       canaryService: {{ include "my-app.serviceNamePreview" . }}
       stableService: {{ include "my-app.serviceNameActive" . }}
       trafficRouting:
