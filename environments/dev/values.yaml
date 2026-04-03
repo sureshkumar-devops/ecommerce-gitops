@@ -17,17 +17,9 @@ service:
   targetPort: 3000 # matches app inside container
 # --- Container & Resource Settings ---
 containerPort: 3000 # matches app inside container
-# Fixed: Added empty resources block to prevent "null" error in template
-resources:
-  limits:
-    cpu: 200m
-    memory: 256Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
 # --- Probe Settings ---
-# Provide defaults to prevent template rendering errors
-probePath: /
+# ✅ health check
+probePath: /health
 readinessProbe:
   initialDelaySeconds: 5
   timeoutSeconds: 2
@@ -76,6 +68,15 @@ monitoring:
   path: /metrics
 rollout:
   enabled: false # no Rollout, just Deployment
+# ✅ REQUIRED FOR HPA
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+# ✅ HPA CONFIG
 hpa:
   enabled: true
   minReplicas: 2
