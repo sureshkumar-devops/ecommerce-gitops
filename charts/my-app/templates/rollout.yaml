@@ -90,6 +90,17 @@ spec:
           ports:
             - name: {{ .Values.monitoring.portName | default "metrics" }}
               containerPort: {{ .Values.service.targetPort | default 3000 }}
+
+          # ✅ REQUIRED FOR HPA
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu | default "100m" }}
+              memory: {{ .Values.resources.requests.memory | default "128Mi" }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu | default "200m" }}
+              memory: {{ .Values.resources.limits.memory | default "256Mi" }}
+
+
           readinessProbe:
             httpGet:
               path: {{ .Values.probePath | default "/" }}
