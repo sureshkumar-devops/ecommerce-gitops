@@ -13,7 +13,7 @@ metadata:
     notifications.argoproj.io/subscribe.on-rollout-completed.slack: devops-alerts
 spec:
   replicas: {{ .Values.replicaCount | default 2 }}
-  revisionHistoryLimit: 2
+  revisionHistoryLimit: 3
   progressDeadlineSeconds: 300
   abortScaleDownDelaySeconds: 30
 
