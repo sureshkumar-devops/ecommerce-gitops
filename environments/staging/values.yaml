@@ -79,3 +79,9 @@ monitoring:
   path: /metrics
 rollout:
   enabled: true
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 60
+  targetMemoryUtilizationPercentage: 60
