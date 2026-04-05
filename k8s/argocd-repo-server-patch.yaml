@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-repo-server
+  namespace: argocd
+spec:
+  template:
+    spec:
+      volumes:
+        - name: custom-tools
+          emptyDir: {}
+ 
+      initContainers:
+        - name: download-avp
+          image: alpine:3.19
+          command: [sh, -c]
+          args:
+            - >
+              wget -O /custom-tools/argocd-vault-plugin
+              https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v1.18.0/argocd-vault-plugin_1.18.0_linux_amd64 &&
+              chmod +x /custom-tools/argocd-vault-plugin
+          volumeMount:
+            - name: custom-tools
+              mountPath: /custom-tools
+        
+      containers:
+        - name: repo-server
+          volumeMounts:
+            - name: custom-tools
+              mountPath: /usr/local/bin/argocd-vault-plugin
+              subPath: argocd-vault-plugin
+
+      #serviceAccountName: argocd-repo-server
+      #automountServiceAccountToken: true
