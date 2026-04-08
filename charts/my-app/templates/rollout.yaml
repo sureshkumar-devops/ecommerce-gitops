@@ -91,6 +91,13 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
+
+          env:
+          - name: DB_USER
+            value: <path:secret/data/{{ .Values.env }}/db#username>
+          - name: DB_PASS
+            value: <path:secret/data/{{ .Values.env }}/db#password>
+
           ports:
             - name: {{ .Values.monitoring.portName | default "metrics" }}
               containerPort: {{ .Values.service.targetPort | default 3000 }}

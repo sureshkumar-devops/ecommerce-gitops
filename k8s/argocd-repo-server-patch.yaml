@@ -6,9 +6,15 @@ metadata:
 spec:
   template:
     spec:
+      serviceAccountName: argocd-repo-server
       volumes:
         - name: custom-tools
           emptyDir: {}
+        - name: cmp-server-plugins
+          emptyDir: {}
+        - name: cmp-server-config
+          configMap:
+            name: argocd-cmp-cm
  
       initContainers:
         - name: download-avp
@@ -19,16 +25,17 @@ spec:
               wget -O /custom-tools/argocd-vault-plugin
               https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v1.18.0/argocd-vault-plugin_1.18.0_linux_amd64 &&
               chmod +x /custom-tools/argocd-vault-plugin
-          volumeMount:
+          volumeMounts:
             - name: custom-tools
               mountPath: /custom-tools
         
       containers:
-        - name: repo-server
+        - name: cmp-server
           volumeMounts:
             - name: custom-tools
               mountPath: /usr/local/bin/argocd-vault-plugin
               subPath: argocd-vault-plugin
-
-      #serviceAccountName: argocd-repo-server
-      #automountServiceAccountToken: true
+            - name: cmp-server-plugins
+              mountPath: /home/argocd/cmp-server/plugins
+            - name: cmp-server-config
+              mountPath: /home/argocd/cmp-server/config
