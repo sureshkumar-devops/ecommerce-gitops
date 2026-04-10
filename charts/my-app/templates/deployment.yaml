@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "my-app.fullname" . }}  
+  name: {{ include "my-app.fullname" . }}
   namespace: {{ .Values.env }}
   labels:
     app.kubernetes.io/managed-by: helm
@@ -10,30 +10,52 @@ metadata:
     app.kubernetes.io/name: my-app
     environment: {{ .Values.env }}
     gitops.branch: {{ .Values.gitopsBranch }}
+
 spec:
-  replicas: {{ .Values.replicaCount  | default 1 }}
+  revisionHistoryLimit: 3
+  replicas: {{ .Values.replicaCount | default 1 }}
+
   selector:
-    matchLabels:        
+    matchLabels:
       app.kubernetes.io/name: {{ .Chart.Name }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+
   template:
     metadata:
-     labels:
-      app.kubernetes.io/name: {{ .Chart.Name }} 
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      labels:
+        app.kubernetes.io/name: {{ .Chart.Name }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+
     spec:
       containers:
         - name: {{ .Chart.Name }}
+
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
+
+          env:
+          - name: DB_USER
+            value: <path:secret/data/{{ .Values.env }}/db#username>
+          - name: DB_PASS
+            value: <path:secret/data/{{ .Values.env }}/db#password>
+
           ports:
             - name: {{ .Values.monitoring.portName | default "metrics" }}
               containerPort: {{ .Values.service.targetPort | default 3000 }}
 
+          # ✅ REQUIRED FOR HPA
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu | default "100m" }}
+              memory: {{ .Values.resources.requests.memory | default "128Mi" }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu | default "500m" }}
+              memory: {{ .Values.resources.limits.memory | default "512Mi" }}
+
           readinessProbe:
             httpGet:
-              path: {{ .Values.probePath }}
-              port: {{ .Values.containerPort }}
+              path: {{ .Values.probePath | default "/health" }}
+              port: {{ .Values.service.targetPort | default 3000 }}
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default 10 }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default 2 }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds | default 10 }}
@@ -41,10 +63,11 @@ spec:
 
           livenessProbe:
             httpGet:
-              path: {{ .Values.probePath }}
-              port: {{ .Values.containerPort }}
+              path: {{ .Values.probePath | default "/health" }}
+              port: {{ .Values.service.targetPort | default 3000 }}
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default 20 }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default 2 }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds | default 10 }}
             failureThreshold: {{ .Values.livenessProbe.failureThreshold | default 3 }}
+
 {{- end }}
