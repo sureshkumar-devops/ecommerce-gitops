@@ -24,6 +24,8 @@ spec:
   strategy:
 {{- if eq .Values.deploymentStrategy "canary" }}
     canary:
+      #successfulJobsHistoryLimit: 2
+      #failedJobsHistoryLimit: 1
       abortScaleDownDelaySeconds: 30
       canaryService: {{ include "my-app.serviceNameCanary" . }}
       stableService: {{ include "my-app.serviceNameActive" . }}
@@ -58,6 +60,8 @@ spec:
 
 {{- if eq .Values.deploymentStrategy "bluegreen" }}
     blueGreen:
+      #successfulJobsHistoryLimit: 2
+      #failedJobsHistoryLimit: 1
       activeService: {{ include "my-app.serviceNameActive" . }}
       previewService: {{ include "my-app.serviceNamePreview" . }}
       autoPromotionEnabled: true
@@ -87,9 +91,27 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
+
+          env:
+          - name: DB_USER
+            value: <path:secret/data/{{ .Values.env }}/db#username>
+          - name: DB_PASS
+            value: <path:secret/data/{{ .Values.env }}/db#password>
+
           ports:
             - name: {{ .Values.monitoring.portName | default "metrics" }}
               containerPort: {{ .Values.service.targetPort | default 3000 }}
+
+          # ✅ REQUIRED FOR HPA
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu | default "100m" }}
+              memory: {{ .Values.resources.requests.memory | default "128Mi" }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu | default "200m" }}
+              memory: {{ .Values.resources.limits.memory | default "256Mi" }}
+
+
           readinessProbe:
             httpGet:
               path: {{ .Values.probePath | default "/" }}

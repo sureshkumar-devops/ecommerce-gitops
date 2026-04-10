@@ -49,12 +49,18 @@ spec:
      repoURL: https://github.com/sureshkumar-devops/ecommerce-gitops.git
      targetRevision: dev  # <--- Point to your dev branch
      path: charts/my-app  # <--- Use the shared templates
-     helm:
-       releaseName: "{{env}}-my-app" 
-       valueFiles:       
-       - "../../environments/{{env}}/values.yaml" # <--- Use dev or staging or prod env values
-       parameters:
-       - name: "env"
+     
+     #helm:
+       #releaseName: "{{env}}-my-app" 
+       #valueFiles:       
+       #- "../../environments/{{env}}/values.yaml" # <--- Use dev or staging or prod env values
+       #parameters:
+       #- name: "env"
+       #  value: "{{env}}"
+     plugin:
+       name: argocd-vault-plugin
+       env:
+       - name: ENV
          value: "{{env}}"
     destination:     
      server: https://kubernetes.default.svc
