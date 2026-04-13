@@ -58,10 +58,12 @@ spec:
        #- name: "env"
        #  value: "{{env}}"
      plugin:
-       name: argocd-vault-plugin
+       name: argocd-vault-plugin-helm
        env:
        - name: ENV
          value: "{{env}}"
+       - name: HELM_ARGS
+         value: "-f ../../environments/{{env}}/values.yaml"
     destination:     
      server: https://kubernetes.default.svc
      namespace: '{{env}}'       

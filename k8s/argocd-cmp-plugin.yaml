@@ -1,25 +1,27 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: argocd-cmp-cm
-  namespace: argocd
+  name: cmp-plugin
 data:
-  plugin.yaml: |
+  avp-helm.yaml: |
+    ---
     apiVersion: argoproj.io/v1alpha1
     kind: ConfigManagementPlugin
     metadata:
-      name: argocd-vault-plugin
+      name: argocd-vault-plugin-helm
     spec:
       allowConcurrency: true
       discover:
         find:
           command:
             - sh
-            - -c
-            - "find . -name '*.yaml' | xargs grep -E -l '<path:|avp.kubernetes.io/path' || true"
+            - "-c"            
+            - "find . -name 'Chart.yaml'" 
       generate:
         command:
-          - argocd-vault-plugin
-          - generate
-          - "."
+          - sh
+          - "-c"
+          - |
+            helm template $ARGOCD_APP_NAME -n $ARGOCD_APP_NAMESPACE ${ARGOCD_ENV_HELM_ARGS} . |
+            argocd-vault-plugin generate --verbose-sensitive-output -
       lockRepo: false
